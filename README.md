@@ -6,8 +6,7 @@
 - ~~basic gameplay UI~~
 - ~~score logic~~
 - no statement repeat in a gameplay
-- dynamic range min and max values based on actual event year
-- guess countdown timer
+- ~~guess countdown timer~~
 - score explainer
 - rich UI
 - deploy demo
