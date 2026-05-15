@@ -19,7 +19,7 @@ export const statements: Statement[] = [
   { statement: "The Achaemenid Empire was an ancient Iranian empire founded by Cyrus the Great of the Achaemenid dynasty in...", year: "-549" },
   { statement: "The tomb of ancient Egyptian Pharaoh Tutankhamun is discovered in the Valley of the Kings.", year: "1922" },
   { statement: "The Cuban Missile Crisis was a 13-day confrontation between the governments of the United States and the Soviet Union during the Cold War.", year: "1962" },
-  { statement: "Salvador Allende wins the 1970 Chilean presidential election.", year: "1970" },
+  { statement: "Salvador Allende wins the Chilean presidential election.", year: "1970" },
   { statement: "In Burkina Faso, a military coup is orchestrated by Blaise Compaoré against incumbent President Thomas Sankara.", year: "1987" },
   { statement: "Ying Zheng, also known as Qin Shi Huang, the king of Qin unifies China and proclaims himself the First Emperor, ending the Warring States period.", year: "-220" },
   //{ statement: "", year: "" },

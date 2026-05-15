@@ -152,7 +152,7 @@ export default function PlayRound({ onRoundEnd, noOfStatements }: PlayRoundProps
 
 
   return (
-    <div className='flex flex-col justify-around gap-2 w-full lg:w-1/2 h-screen'>
+    <div className='flex flex-col justify-between gap-2 size-full lg:w-1/2 bg-background p-2 rounded-xl'>
 
         {/* Score and Timer */}
         <header className="h-1/5 flex gap-2 justify-between items-start">
