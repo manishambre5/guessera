@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./ui/card";
 import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group";
 import { Button } from "./ui/button";
@@ -10,7 +9,7 @@ type GameSetupProps = {
 };
 
 function GameSetup({ onStart }: GameSetupProps) {
-    const [gameType, setGameType] = useState<boolean>(false);
+    //const [gameType, setGameType] = useState<boolean>(false);
 
   return (
     <Card className="w-full max-w-lg">

@@ -14,7 +14,7 @@ type PlayRoundProps = {
   onRoundEnd?: (report: { finalScore: number }) => void;
 };
 
-export default function PlayRound({ mode, difficulty, onRoundEnd }: PlayRoundProps) {
+export default function PlayRound({ onRoundEnd }: PlayRoundProps) {
     // STATES
     const [chosenStatements, setChosenStatements] = useState<Statement[]>([]);
     const [currentStatementIndex, setCurrentStatementIndex] = useState<number>(0);

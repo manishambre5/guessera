@@ -4,11 +4,11 @@ import PlayRound from './components/PlayRound';
 import type { GameRoundReport } from './types';
 import RoundReport from './components/RoundReport';
 
-type GameMode = "single" | "multi";
+//type GameMode = "single" | "multi";
 
-type GameSettings = {
-  mode: GameMode;
-};
+//type GameSettings = {
+  //mode: GameMode;
+//};
 
 function App() {
   const [playing, setPlaying] = useState<boolean>(false);
