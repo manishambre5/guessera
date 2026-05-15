@@ -12,7 +12,7 @@ function GameSetup({ onStart }: GameSetupProps) {
     //const [gameType, setGameType] = useState<boolean>(false);
 
   return (
-    <Card className="w-full max-w-lg">
+    <Card className="lg:w-1/2 w-full">
         <CardHeader className="text-center">
             <CardTitle className="text-2xl">Welcome to guessEra!</CardTitle>
             <CardDescription>Guess the year when a historical event occured!</CardDescription>

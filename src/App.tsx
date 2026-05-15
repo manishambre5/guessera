@@ -24,7 +24,7 @@ function App() {
   };
 
   return (
-    <div className='flex flex-col gap-2 w-screen h-screen items-center justify-center p-2'>
+    <div className='flex flex-col gap-2 h-screen w-screen items-center justify-center p-2'>
       {!playing ? (
         gameRoundScore ? (
           <RoundReport report={gameRoundScore} onGoHome={handleGoHome} />

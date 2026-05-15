@@ -3,11 +3,21 @@ export type Statement = {
   year : string;
 };
 
+export type PlayRoundProps = {
+  mode: "single" | "multi";
+  difficulty?: "easy" | "medium" | "hard";
+  onRoundEnd?: (report: GameRoundReport) => void;
+};
+
+export type PlayerGuess = {
+  statement: string;
+  actualYear: number;
+  guessedYear: number;
+  guessScore: number;
+};
+
 export type GameRoundReport = {
-  statements? : string[];
-  actualYear? : string[];
-  scores?: number[];
-  scoreIncrements? : number[];
+  roundGuessDetails?: PlayerGuess[];
   finalScore: number;
 }
 

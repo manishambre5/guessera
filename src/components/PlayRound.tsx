@@ -5,20 +5,17 @@ import { Field, FieldLabel, FieldSeparator } from "./ui/field";
 import { Slider } from "./ui/slider";
 import { statements } from "@/statements";
 import { Button } from "./ui/button";
-import type { Statement } from "@/types";
+import type { PlayerGuess, PlayRoundProps, Statement } from "@/types";
 import Countdown from "./Countdown";
+import formatYear from "@/utils/formatYear";
 
-type PlayRoundProps = {
-  mode: "single" | "multi";
-  difficulty?: "easy" | "medium" | "hard";
-  onRoundEnd?: (report: { finalScore: number }) => void;
-};
 
 export default function PlayRound({ onRoundEnd }: PlayRoundProps) {
     // STATES
     const [chosenStatements, setChosenStatements] = useState<Statement[]>([]);
     const [currentStatementIndex, setCurrentStatementIndex] = useState<number>(0);
     const [sliderValue, setSliderValue] = useState<number[]>([1]);
+    const [playerGuesses, setPlayerGuesses] = useState<PlayerGuess[]>([]);
     const [score, setScore] = useState<number>(0);
     const [round, setRound] = useState<number>(0); // to reset round timer
 
@@ -33,25 +30,25 @@ export default function PlayRound({ onRoundEnd }: PlayRoundProps) {
         return Math.round(value);
     });
 
-    // To format year (-1000 --> ~1000BCE)
-    const formatYear = (value: number): string => {
-        const num = Number(value);
-        // num-1 cauz 256 BCE is mathematically year -255 and there's no year 0 in the BCE-CE scale
-        return num < 1 ? `${Math.abs(num)} BCE` : `${num} CE`;
-    };
-
     // Handle submit guess
     const handleSubmitGuess = (e?: React.SubmitEvent): void => {
         if (e) e.preventDefault();
-
-        console.log(sliderValue[0]);
-        console.log(chosenStatements[currentStatementIndex].year);
         
         // calculate the score
         const calculatedScore = calculateScore(sliderValue[0], Number(chosenStatements[currentStatementIndex].year));
         
         // update score state
         setScore((prevScore) => prevScore + calculatedScore);
+
+        // build guess object for report
+        const guessData: PlayerGuess = {
+            statement: chosenStatements[currentStatementIndex].statement,
+            actualYear: Number(chosenStatements[currentStatementIndex].year),
+            guessedYear: sliderValue[0],
+            guessScore: calculatedScore,
+        };
+        // updating player guess data for report
+        setPlayerGuesses((prev) => [...prev, guessData]);
 
         // check if last statement reached
         if (currentStatementIndex < chosenStatements.length - 1) {
@@ -61,7 +58,8 @@ export default function PlayRound({ onRoundEnd }: PlayRoundProps) {
             if (onRoundEnd) {
                 onRoundEnd({
                     finalScore: (score || 0) + calculatedScore,
-                }); // end round and send final score back to parent
+                    roundGuessDetails: [...playerGuesses, guessData],
+                }); // end round and send final score and guess details back to parent
             }
         }
     };
@@ -102,7 +100,7 @@ export default function PlayRound({ onRoundEnd }: PlayRoundProps) {
 
 
   return (
-    <div className='flex flex-col justify-around gap-2 w-full md:w-1/2 h-screen'>
+    <div className='flex flex-col justify-around gap-2 w-full lg:w-1/2 h-screen'>
 
         {/* Score and Timer */}
         <header className="h-1/5 flex gap-2 justify-between items-start">
@@ -155,7 +153,7 @@ export default function PlayRound({ onRoundEnd }: PlayRoundProps) {
                             defaultValue={[1]}
                             onValueChange={setSliderValue}
                         />
-                        <FieldLabel className='text-zinc-600 uppercase w-full flex justify-between'>
+                        <FieldLabel className='text-muted-foreground uppercase w-full flex justify-between'>
                             {yearLabels.map((year, i) => (
                             <span key={i} className="text-sm">
                                 {Math.abs(year)} {year < 0 ? "BCE" : "CE"}
