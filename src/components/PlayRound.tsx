@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Item, ItemActions, ItemContent, ItemHeader, ItemTitle } from "./ui/item";
 import { Field, FieldLabel, FieldSeparator } from "./ui/field";
@@ -8,6 +8,7 @@ import { Button } from "./ui/button";
 import type { PlayerGuess, PlayRoundProps, Statement } from "@/types";
 import Countdown from "./Countdown";
 import formatYear from "@/utils/formatYear";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 
 export default function PlayRound({ onRoundEnd }: PlayRoundProps) {
@@ -19,9 +20,12 @@ export default function PlayRound({ onRoundEnd }: PlayRoundProps) {
     const [score, setScore] = useState<number>(0);
     const [round, setRound] = useState<number>(0); // to reset round timer
 
+    // REFs
+    const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null); // for smooth hold and press speed increase
+
     // CONSTANTS
     const currentYear: number = new Date().getFullYear();
-    const oldestYear: number = -5000;
+    const oldestYear: number = -4999;
     // for slider range labels
     const steps: number = 3;
     const yearLabels: number[] = Array.from({ length: steps }, (_, i) => {
@@ -79,6 +83,49 @@ export default function PlayRound({ onRoundEnd }: PlayRoundProps) {
         return result;
     }
 
+    // Slider thumb arrow button control
+    const moveSliderThumb = (direction: boolean): void => {
+        setSliderValue((prev) => {
+            const amount = direction === true ? 1 : -1;
+            return [
+                Math.min(
+                    currentYear,
+                    Math.max(oldestYear, prev[0] + amount)
+                ),
+            ];
+        });
+    };
+    // handle pointer (thumb mover button click/touch)
+    const handlePointerDown = (direction: boolean) => (e: React.PointerEvent) => {
+        e.currentTarget.setPointerCapture(e.pointerId);
+        startHolding(direction);
+    };
+    const handlePointerUp = () => stopHolding();
+    // Trigger Hold and Press
+    const startHolding = (direction: boolean): void => {
+        moveSliderThumb(direction); // act on click immediately
+
+        const startTime = Date.now();
+        const tick = () => {
+            moveSliderThumb(direction);
+            // elapsed hold time in seconds
+            const holdTime = (Date.now() - startTime) / 1000;
+
+            //Exponential easing curve to start slow at 500ms and go to as fast as 50ms
+            const delay = Math.max(50,500 * Math.exp(-holdTime / 2));
+
+            timeoutRef.current = setTimeout(tick, delay);
+        };
+        timeoutRef.current = setTimeout(tick, 500);
+    };
+    // Stop Hold and Press
+    const stopHolding = (): void => {
+        if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+            timeoutRef.current = null;
+        }
+    };
+
 
     useEffect(() => {
         // pick 'n' random statements
@@ -94,7 +141,6 @@ export default function PlayRound({ onRoundEnd }: PlayRoundProps) {
             }
             return chosenStatements;
         }
-
         setChosenStatements(pickRandomStatements(5));
     }, []);
 
@@ -117,7 +163,7 @@ export default function PlayRound({ onRoundEnd }: PlayRoundProps) {
                 <ItemHeader className="">TIME LEFT</ItemHeader>
                 <ItemContent>
                     <ItemTitle className="text-2xl">
-                        <Countdown key={round} limit={15} onComplete={handleSubmitGuess} />
+                        <Countdown key={round} limit={90} onComplete={handleSubmitGuess} />
                     </ItemTitle>
                 </ItemContent>
             </Item>
@@ -138,29 +184,60 @@ export default function PlayRound({ onRoundEnd }: PlayRoundProps) {
 
         {/* Guess Form section */}
         <section className="h-1/3 flex items-end">
-            <Card className="w-full">
+            <Card className="w-full" size="sm">
                 <CardContent>
                 <form
                     className="flex flex-col gap-4 h-1/3"
                     onSubmit={handleSubmitGuess}
                 >
-                    {/* Scale */}
-                    <Field className='w-full'>
-                        <Slider
-                            min={oldestYear}
-                            max={currentYear}
-                            step={1}
-                            defaultValue={[1]}
-                            onValueChange={setSliderValue}
-                        />
-                        <FieldLabel className='text-muted-foreground uppercase w-full flex justify-between'>
-                            {yearLabels.map((year, i) => (
-                            <span key={i} className="text-sm">
-                                {Math.abs(year)} {year < 0 ? "BCE" : "CE"}
-                            </span>
-                            ))}
-                        </FieldLabel>
-                    </Field>
+                    {/* Guess Controls */}
+                    <div className="items-start h-14 flex gap-1">
+                        <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            onPointerDown={handlePointerDown(false)}
+                            onPointerUp={handlePointerUp}
+                            onPointerLeave={handlePointerUp}
+                            onPointerCancel={handlePointerUp}
+                        >
+                            <ChevronLeft />
+                        </Button>
+                        <Field className='w-full self-end'>
+                            <Slider
+                                min={oldestYear}
+                                max={currentYear}
+                                step={1}
+                                value={sliderValue}
+                                onValueChange={setSliderValue}
+                            />
+                            <FieldLabel className='text-muted-foreground uppercase w-full flex justify-between'>
+                                {yearLabels.map((year, i) => (
+                                <div key={i}>
+                                    <span className={`border-r border-muted-foreground h-3 w-0 flex ${
+                                        i === 0 ? "mr-auto"
+                                        : i === 1 ? "m-auto"
+                                        : "ml-auto"
+                                    }`}></span>
+                                    <span key={i} className="text-xs">
+                                        {Math.abs(year)} {year < 0 ? "BCE" : "CE"}
+                                    </span>
+                                </div>
+                                ))}
+                            </FieldLabel>
+                        </Field>
+                        <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            onPointerDown={handlePointerDown(true)}
+                            onPointerUp={handlePointerUp}
+                            onPointerLeave={handlePointerUp}
+                            onPointerCancel={handlePointerUp}
+                        >
+                            <ChevronRight />
+                        </Button>
+                    </div>
 
                     <FieldSeparator />
 
@@ -172,9 +249,8 @@ export default function PlayRound({ onRoundEnd }: PlayRoundProps) {
                         </ItemContent>
                         <ItemActions>
                             <Button 
-                                type='submit' 
-                                //disabled={isTransitioning}
-                                //className={`join-item btn btn-lg ${isTransitioning ? 'btn-disabled' : ''}`}
+                                type='submit'
+                                size="lg"
                             >
                                 Submit Guess
                             </Button>

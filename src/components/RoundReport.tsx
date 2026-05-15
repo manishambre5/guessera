@@ -44,7 +44,7 @@ const RoundReport: React.FC<GameRoundReportProps> = ({ report, onGoHome }) => {
         </Table>
       </CardContent>
       <CardFooter>
-        <Button className="m-auto" onClick={onGoHome}>
+        <Button className="m-auto" size="lg" onClick={onGoHome}>
             Home
         </Button>
       </CardFooter>

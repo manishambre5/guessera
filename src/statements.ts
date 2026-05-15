@@ -1,8 +1,10 @@
 import type { Statement } from "./types";
 
+//https://en.wikipedia.org/wiki/List_of_years
+
 export const statements: Statement[] = [
   { statement: "The construction of the Taj Mahal was completed in the year...", year: "1653" },
-  { statement: "The Code of Hammurabi was established in ancient Mesopotamia in...", year: "-1754" },
+  { statement: "The Code of Hammurabi was established in ancient Mesopotamia in...", year: "-1752" },
   { statement: "The construction of the Great Pyramid of Giza was completed in...", year: "-2560" },
   { statement: "The Western Roman Empire fell in...", year: "476" },
   { statement: "The Magna Carta was signed in England in...", year: "1215" },
