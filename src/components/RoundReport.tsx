@@ -4,6 +4,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "./ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
 import formatYear from "@/utils/formatYear";
 import { Separator } from "./ui/separator";
+import { ScrollArea } from "./ui/scroll-area";
 
 type GameRoundReportProps = {
   report: GameRoundReport;
@@ -12,14 +13,15 @@ type GameRoundReportProps = {
 
 const RoundReport: React.FC<GameRoundReportProps> = ({ report, onGoHome }) => {
   return (
-    <Card className="lg:w-1/2 w-full">
+    <Card className="lg:w-1/2 w-full max-h-screen flex flex-col">
       <CardHeader className="text-center">
         <CardTitle className="text-xl">
             Your final score: {report.finalScore}
         </CardTitle>
       </CardHeader>
       <Separator />
-      <CardContent>
+      <CardContent className="flex-1 min-h-0">
+        <ScrollArea className="h-full">
         <Table className="">
           <TableHeader>
             <TableRow>
@@ -42,6 +44,7 @@ const RoundReport: React.FC<GameRoundReportProps> = ({ report, onGoHome }) => {
             ))}
           </TableBody>
         </Table>
+        </ScrollArea>
       </CardContent>
       <CardFooter>
         <Button className="m-auto" size="lg" onClick={onGoHome}>

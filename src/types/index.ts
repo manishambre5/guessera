@@ -3,12 +3,6 @@ export type Statement = {
   year : string;
 };
 
-export type PlayRoundProps = {
-  mode: "single" | "multi";
-  difficulty?: "easy" | "medium" | "hard";
-  onRoundEnd?: (report: GameRoundReport) => void;
-};
-
 export type PlayerGuess = {
   statement: string;
   actualYear: number;
@@ -21,7 +15,10 @@ export type GameRoundReport = {
   finalScore: number;
 }
 
-export type CountdownProps = {
-  limit: number;
-  onComplete?: () => void;
+export type GameMode = "single" | "multi";
+
+export type GameSettings = {
+  mode: GameMode;
+  noOfStatements: number;
+  difficulty: string;
 };

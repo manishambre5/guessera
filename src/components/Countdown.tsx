@@ -1,5 +1,9 @@
-import type { CountdownProps } from "@/types";
 import { useEffect, useState } from "react";
+
+type CountdownProps = {
+  limit: number;
+  onComplete?: () => void;
+};
 
 const Countdown = ({ limit, onComplete }: CountdownProps) => {
   const [counter, setCounter] = useState(limit);

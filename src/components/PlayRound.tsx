@@ -5,13 +5,19 @@ import { Field, FieldLabel, FieldSeparator } from "./ui/field";
 import { Slider } from "./ui/slider";
 import { statements } from "@/statements";
 import { Button } from "./ui/button";
-import type { PlayerGuess, PlayRoundProps, Statement } from "@/types";
+import type { GameRoundReport, PlayerGuess, Statement } from "@/types";
 import Countdown from "./Countdown";
 import formatYear from "@/utils/formatYear";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
+type PlayRoundProps = {
+  mode: "single" | "multi";
+  difficulty?: "easy" | "medium" | "hard";
+  onRoundEnd?: (report: GameRoundReport) => void;
+  noOfStatements?: number;
+};
 
-export default function PlayRound({ onRoundEnd }: PlayRoundProps) {
+export default function PlayRound({ onRoundEnd, noOfStatements }: PlayRoundProps) {
     // STATES
     const [chosenStatements, setChosenStatements] = useState<Statement[]>([]);
     const [currentStatementIndex, setCurrentStatementIndex] = useState<number>(0);
@@ -141,7 +147,7 @@ export default function PlayRound({ onRoundEnd }: PlayRoundProps) {
             }
             return chosenStatements;
         }
-        setChosenStatements(pickRandomStatements(5));
+        setChosenStatements(pickRandomStatements(noOfStatements ?? 5));
     }, []);
 
 
@@ -163,7 +169,7 @@ export default function PlayRound({ onRoundEnd }: PlayRoundProps) {
                 <ItemHeader className="">TIME LEFT</ItemHeader>
                 <ItemContent>
                     <ItemTitle className="text-2xl">
-                        <Countdown key={round} limit={90} onComplete={handleSubmitGuess} />
+                        <Countdown key={round} limit={20} onComplete={handleSubmitGuess} />
                     </ItemTitle>
                 </ItemContent>
             </Item>
@@ -178,7 +184,7 @@ export default function PlayRound({ onRoundEnd }: PlayRoundProps) {
                     </CardHeader>
                 </Card>
                 ) : (
-                    <span>game over.</span>
+                    <span className="pl-4">Nothing left to guess :(</span>
                 )}
         </section>
 

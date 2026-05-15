@@ -4,15 +4,11 @@ import PlayRound from './components/PlayRound';
 import type { GameRoundReport } from './types';
 import RoundReport from './components/RoundReport';
 
-//type GameMode = "single" | "multi";
-
-//type GameSettings = {
-  //mode: GameMode;
-//};
 
 function App() {
   const [playing, setPlaying] = useState<boolean>(false);
   const [gameRoundScore, setGameRoundScore] = useState<GameRoundReport | null>(null);
+  const [noOfStatements, setNoOfStatements] = useState<number>();
 
   const handleGameRoundEnd = (report: {finalScore: number}) => {
     setGameRoundScore(report);
@@ -20,7 +16,8 @@ function App() {
   }
 
   const handleGoHome = () => {
-    setGameRoundScore(null);  // reset game round report
+    setGameRoundScore(null);  // reset game round report state
+    setNoOfStatements(undefined);  // reset no of statements state
   };
 
   return (
@@ -29,10 +26,10 @@ function App() {
         gameRoundScore ? (
           <RoundReport report={gameRoundScore} onGoHome={handleGoHome} />
         ) : (
-          <GameSetup onStart={() => setPlaying(true)} />
+          <GameSetup onStart={() => setPlaying(true)} onSetNoOfStatements={setNoOfStatements} />
         )
       ) : (
-        <PlayRound mode="single" onRoundEnd={handleGameRoundEnd} />
+        <PlayRound mode="single" noOfStatements={noOfStatements} onRoundEnd={handleGameRoundEnd} />
       )}
     </div>
   );
