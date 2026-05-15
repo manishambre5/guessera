@@ -34,7 +34,7 @@ const Countdown = ({ limit, onComplete }: CountdownProps) => {
   return (
     <span className="">
       <span
-        className={counter <= 5 && counter > 0 ? "text-red-500" : ""}
+        className={counter <= 5 && counter > 0 ? "text-destructive" : ""}
         aria-live="polite"
         aria-label={String(counter)}
       >

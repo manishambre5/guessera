@@ -20,7 +20,7 @@ function GameSetup({ onStart, onSetNoOfStatements }: GameSetupProps) {
   return (
     <Card className="lg:w-1/2 w-full">
         <CardHeader className="text-center">
-            <CardTitle className="text-2xl">Welcome to guessEra!</CardTitle>
+            <CardTitle className="text-3xl">Welcome to <span className="font-logo text-chart-4 italic font-bold text-4xl">GuessEra</span></CardTitle>
             <CardDescription>Guess the year when a historical event occured!</CardDescription>
         </CardHeader>
 
