@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
-import { Item, ItemContent, ItemHeader } from "../ui/item";
+import { Item } from "../ui/item";
 import type { PartySettings } from "@/types";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
