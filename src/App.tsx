@@ -12,7 +12,6 @@ function App() {
   const [partying, setPartying] = useState<boolean>(false);
   const [multiplayerAction, setMultiplayerAction] = useState<MultiPlayerAction>();
   const [gameRoundScore, setGameRoundScore] = useState<GameRoundReport | null>(null);
-  const [noOfStatements, setNoOfStatements] = useState<number>();
   const [gameSettings, setGameSettings] = useState<GameSettings>();
 
   const handleGameRoundEnd = (report: {finalScore: number}) => {
@@ -22,7 +21,6 @@ function App() {
 
   const handleGoHome = () => {
     setGameRoundScore(null);  // reset game round report state
-    setNoOfStatements(undefined);  // reset no of statements state
     setPartying(false);
   };
 

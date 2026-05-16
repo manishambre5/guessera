@@ -143,6 +143,7 @@ export default function PlayRound({ onRoundEnd, gameSettings }: PlayRoundProps) 
                     chosenStatements.push(statements[randomIndex]);
                 }
             }
+            console.log(chosenStatements);
             return chosenStatements;
         }
         setChosenStatements(pickRandomStatements(gameSettings?.noOfStatements ?? 5));
@@ -153,9 +154,9 @@ export default function PlayRound({ onRoundEnd, gameSettings }: PlayRoundProps) 
     <div className='flex flex-col justify-between gap-2 size-full lg:w-1/2 bg-background p-2 rounded-xl'>
 
         {/* Score and Timer */}
-        <header className="h-1/5 flex gap-2 justify-between items-start">
+        <header className="h-fit flex flex-row-reverse gap-2 justify-between items-start">
             {/* Score */}
-            <Item variant="outline" className="w-1/3 flex flex-col">
+            <Item variant="muted" className="max-w-1/3 flex flex-col">
                 <ItemHeader className="">SCORE</ItemHeader>
                 <ItemContent>
                     <ItemTitle className="text-2xl">{score}</ItemTitle>
@@ -163,7 +164,7 @@ export default function PlayRound({ onRoundEnd, gameSettings }: PlayRoundProps) 
             </Item>
 
             {/* Timer */}
-            <Item variant="outline" className="w-1/3 flex flex-col">
+            <Item variant="muted" className="w-fit flex flex-col">
                 <ItemHeader className="">TIME LEFT</ItemHeader>
                 <ItemContent>
                     <ItemTitle className="text-2xl">
@@ -174,10 +175,20 @@ export default function PlayRound({ onRoundEnd, gameSettings }: PlayRoundProps) 
         </header>
 
         {/* Statement section */}
-        <section className="p-2 h-1/4 flex items-center">
+        <section className="flex-1 flex flex-col items-center">
+
             {chosenStatements.length > 0 && currentStatementIndex < chosenStatements.length ? (
-                <Card className="w-full">
-                    <CardHeader>
+                    <Card className="flex-1 flex flex-col justify-center relative w-full pt-0">
+                    {chosenStatements[currentStatementIndex].img?.trim() &&
+                        <div className="flex-1 relative">
+                            <img
+                                src={chosenStatements[currentStatementIndex].img}
+                                className="absolute inset-0 size-full object-cover brightness-60 dark:brightness-40"
+                                alt="Event cover"
+                            />
+                        </div>
+                    }
+                    <CardHeader className="h-fit">
                         <CardTitle className="text-xl text-center">{chosenStatements[currentStatementIndex].statement}</CardTitle>
                     </CardHeader>
                 </Card>
@@ -187,7 +198,7 @@ export default function PlayRound({ onRoundEnd, gameSettings }: PlayRoundProps) 
         </section>
 
         {/* Guess Form section */}
-        <section className="h-1/3 flex items-end">
+        <section className="min-h-1/4 flex items-end">
             <Card className="w-full" size="sm">
                 <CardContent>
                 <form
