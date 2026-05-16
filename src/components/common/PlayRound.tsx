@@ -1,23 +1,21 @@
 import { useEffect, useRef, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { Item, ItemActions, ItemContent, ItemHeader, ItemTitle } from "./ui/item";
-import { Field, FieldLabel, FieldSeparator } from "./ui/field";
-import { Slider } from "./ui/slider";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Item, ItemActions, ItemContent, ItemHeader, ItemTitle } from "../ui/item";
+import { Field, FieldLabel, FieldSeparator } from "../ui/field";
+import { Slider } from "../ui/slider";
 import { statements } from "@/statements";
-import { Button } from "./ui/button";
-import type { GameRoundReport, PlayerGuess, Statement } from "@/types";
+import { Button } from "../ui/button";
+import type { GameRoundReport, GameSettings, PlayerGuess, Statement } from "@/types";
 import Countdown from "./Countdown";
 import formatYear from "@/utils/formatYear";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 type PlayRoundProps = {
-  mode: "single" | "multi";
-  difficulty?: "easy" | "medium" | "hard";
+  gameSettings?: GameSettings;
   onRoundEnd?: (report: GameRoundReport) => void;
-  noOfStatements?: number;
 };
 
-export default function PlayRound({ onRoundEnd, noOfStatements }: PlayRoundProps) {
+export default function PlayRound({ onRoundEnd, gameSettings }: PlayRoundProps) {
     // STATES
     const [chosenStatements, setChosenStatements] = useState<Statement[]>([]);
     const [currentStatementIndex, setCurrentStatementIndex] = useState<number>(0);
@@ -147,7 +145,7 @@ export default function PlayRound({ onRoundEnd, noOfStatements }: PlayRoundProps
             }
             return chosenStatements;
         }
-        setChosenStatements(pickRandomStatements(noOfStatements ?? 5));
+        setChosenStatements(pickRandomStatements(gameSettings?.noOfStatements ?? 5));
     }, []);
 
 

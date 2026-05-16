@@ -1,14 +1,19 @@
 import { useState } from 'react';
-import GameSetup from './components/GameSetup';
-import PlayRound from './components/PlayRound';
-import type { GameRoundReport } from './types';
-import RoundReport from './components/RoundReport';
+import GameSetup from './components/common/GameSetup';
+import PlayRound from './components/common/PlayRound';
+import type { GameRoundReport, GameSettings, MultiPlayerAction } from './types';
+import RoundReport from './components/common/RoundReport';
+import CreateParty from './components/multiplayer/CreateParty';
+import JoinParty from './components/multiplayer/JoinParty';
 
 
 function App() {
   const [playing, setPlaying] = useState<boolean>(false);
+  const [partying, setPartying] = useState<boolean>(false);
+  const [multiplayerAction, setMultiplayerAction] = useState<MultiPlayerAction>();
   const [gameRoundScore, setGameRoundScore] = useState<GameRoundReport | null>(null);
   const [noOfStatements, setNoOfStatements] = useState<number>();
+  const [gameSettings, setGameSettings] = useState<GameSettings>();
 
   const handleGameRoundEnd = (report: {finalScore: number}) => {
     setGameRoundScore(report);
@@ -18,7 +23,9 @@ function App() {
   const handleGoHome = () => {
     setGameRoundScore(null);  // reset game round report state
     setNoOfStatements(undefined);  // reset no of statements state
+    setPartying(false);
   };
+
 
   return (
     <div className="relative h-screen overflow-hidden">
@@ -29,12 +36,31 @@ function App() {
       <div className='flex flex-col gap-2 h-screen w-screen items-center justify-center p-2 relative z-10'>
         {!playing ? (
           gameRoundScore ? (
-            <RoundReport report={gameRoundScore} onGoHome={handleGoHome} />
+            <RoundReport
+              report={gameRoundScore}
+              onGoHome={handleGoHome}
+            />
           ) : (
-            <GameSetup onStart={() => setPlaying(true)} onSetNoOfStatements={setNoOfStatements} />
+            ! partying ? (
+              <GameSetup
+                onStart={() => setPlaying(true)}
+                onMultiplayerMode={(value: MultiPlayerAction) => {
+                  setPartying(true);
+                  setMultiplayerAction(value);
+                }}
+                onSetGameSettings={setGameSettings}
+              />              
+            ) : multiplayerAction === "create" ? (
+              <CreateParty onGoHome={handleGoHome} />
+            ) : (
+              <JoinParty onGoHome={handleGoHome} />
+            )
           )
         ) : (
-          <PlayRound mode="single" noOfStatements={noOfStatements} onRoundEnd={handleGameRoundEnd} />
+          <PlayRound
+            onRoundEnd={handleGameRoundEnd}
+            gameSettings={gameSettings}
+          />
         )}
       </div>
     </div>

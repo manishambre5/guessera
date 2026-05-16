@@ -1,10 +1,10 @@
 import type { GameRoundReport, PlayerGuess } from "@/types";
-import { Button } from "./ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "./ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
+import { Button } from "../ui/button";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "../ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 import formatYear from "@/utils/formatYear";
-import { Separator } from "./ui/separator";
-import { ScrollArea } from "./ui/scroll-area";
+import { Separator } from "../ui/separator";
+import { ScrollArea } from "../ui/scroll-area";
 
 type GameRoundReportProps = {
   report: GameRoundReport;
@@ -47,9 +47,11 @@ const RoundReport: React.FC<GameRoundReportProps> = ({ report, onGoHome }) => {
         </ScrollArea>
       </CardContent>
       <CardFooter>
-        <Button className="m-auto" size="lg" onClick={onGoHome}>
-            Home
-        </Button>
+        <div className="flex items-center justify-center gap-4 w-full">
+          <Button size="lg" onClick={onGoHome}>
+              Home
+          </Button>
+        </div>
       </CardFooter>
     </Card>
   );

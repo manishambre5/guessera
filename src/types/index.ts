@@ -16,9 +16,18 @@ export type GameRoundReport = {
 }
 
 export type GameMode = "single" | "multi";
+export type GameDifficulty = "easy" | "medium" | "hard";
+export type MultiPlayerAction = "create" | "join" | null;
 
-export type GameSettings = {
-  mode: GameMode;
+export type GamePreferences = {
   noOfStatements: number;
-  difficulty: string;
+  difficulty: GameDifficulty;
+}
+export type GameSettings = GamePreferences & {
+  mode: GameMode;
+};
+
+export type PartySettings = {
+  noOfStatements: number;
+  difficulty: GameDifficulty;
 };
