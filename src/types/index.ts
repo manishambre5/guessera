@@ -1,6 +1,7 @@
 export type Statement = {
   statement : string;
   year : string;
+  img?: string;
 };
 
 export type PlayerGuess = {
