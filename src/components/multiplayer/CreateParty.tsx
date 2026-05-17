@@ -5,19 +5,36 @@ import { Item, ItemContent, ItemHeader } from "../ui/item";
 import type { PartySettings } from "@/types";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
+import { useState } from "react";
 
 type CreatePartyProps = {
-  onStart?: () => void;
+  onCreateParty?: () => void;
   onGoHome: () => void;
-  onPartySettings?: (value: PartySettings) => void;
+  onSetPartySettings?: (value: PartySettings) => void;
   hostID?: string;
   partyID?: string;
 };
 
-export default function CreateParty({ onGoHome }: CreatePartyProps) {
+export default function CreateParty({ onCreateParty, onSetPartySettings, onGoHome }: CreatePartyProps) {
     // LOCAL STATES
+    const [hostName, setHostName] = useState<string>("");
+    const [partyName, setPartyName] = useState<string>("");
+    const [partyCode, setPartyCode] = useState<string>("");
 
     // HANDLERS
+    const handleCreateParty = () => {
+        if (!hostName.trim() || !partyName.trim()) {
+            alert("Please fill in both fields");
+            return;
+        }
+
+        // Generate random 4-character party code
+        const code = Math.random().toString(36).substring(2, 6).toUpperCase();
+        setPartyCode(code);
+
+        onSetPartySettings?.({ hostName, partyName, partyCode: code });
+        onCreateParty?.();
+    };
 
   return (
     <Card className="lg:w-1/2 w-full">
@@ -33,20 +50,35 @@ export default function CreateParty({ onGoHome }: CreatePartyProps) {
 
             <Item>
                 <div className="flex gap-2 items-center justify-center w-full">
-                    <Label htmlFor="partyName">Party Name</Label>
+                    <Label htmlFor="host-name">Host Name</Label>
+                    <Input
+                        id="host-name"
+                        name="host-name"
+                        placeholder="Jane Doe IV"
+                        className="w-fit"
+                        value={hostName}
+                        onChange={(e) => setHostName(e.target.value)}
+                        required
+                    />
+                </div>
+                <div className="flex gap-2 items-center justify-center w-full">
+                    <Label htmlFor="party-name">Party Name</Label>
                     <Input
                         id="party-name"
                         name="party-name"
                         placeholder="heestoreans"
                         className="w-fit"
+                        value={partyName}
+                        onChange={(e) => setPartyName(e.target.value)}
+                        required
                     />
                 </div>
             </Item>
 
-            <Item variant="outline" className="w-fit">
+            <Item variant="outline" className="w-full">
                 <ItemHeader>Share the Party code with your friends so they can join!</ItemHeader>
                 <ItemContent>
-                    {/* Code to generate party code for sharing */}
+                    {partyCode && <p className="text-2xl text-center">{partyCode}</p>}
                 </ItemContent>
             </Item>
 
@@ -54,7 +86,7 @@ export default function CreateParty({ onGoHome }: CreatePartyProps) {
         </CardContent>
         <CardFooter>
             <div className="flex items-center justify-center gap-4 w-full">
-                <Button size="lg" onClick={undefined}>Create Party</Button>
+                <Button size="lg" onClick={handleCreateParty}>Create Party</Button>
                 <Button size="lg" onClick={onGoHome}>Home</Button>
             </div>
         </CardFooter>
