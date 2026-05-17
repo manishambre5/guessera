@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import GameSetup from './components/common/GameSetup';
 import PlayRound from './components/common/PlayRound';
-import type { GameRoundReport, GameSettings, MultiPlayerAction, PartySettings } from './types';
+import type { GameRoundReport, GameSettings, MultiPlayerAction, PartySettings, Player } from './types';
 import RoundReport from './components/common/RoundReport';
 import CreateParty from './components/multiplayer/CreateParty';
 import JoinParty from './components/multiplayer/JoinParty';
@@ -16,11 +16,18 @@ function App() {
   const [gameRoundScore, setGameRoundScore] = useState<GameRoundReport | null>(null);
   const [gameSettings, setGameSettings] = useState<GameSettings>();
   const [partySettings, setPartySettings] = useState<PartySettings>();
+  
+  // mock list of players for multiplayer party
+  const mock: Player[] = [
+    { id: "p3", name: "Charlie" },
+    { id: "p4", name: "Ila" },
+  ];
 
   const handleGameRoundEnd = (report: {finalScore: number}) => {
     setGameRoundScore(report);
     setPlaying(false);
   }
+
 
   const handleGoHome = () => {
     setGameRoundScore(null);  // reset game round report state
@@ -56,6 +63,7 @@ function App() {
                   partySettings={partySettings}
                   onSetGameSettings={setGameSettings}
                   onStart={() => setPlaying(true)}
+                  players={mock}
                 />
               ) : ( // player isn't in a party yet
                 multiplayerAction === "create" ? ( // player clicked create
