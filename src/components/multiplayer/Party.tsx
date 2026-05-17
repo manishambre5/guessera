@@ -2,9 +2,10 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
 import { Item, ItemContent, ItemHeader } from "../ui/item";
-import type { GamePreferences, GameSettings, PartySettings } from "@/types";
+import type { GamePreferences, GameSettings, PartySettings, Player } from "@/types";
 import Preferences from "../common/Preferences";
 import { useState } from "react";
+import { Star } from "lucide-react";
 
 type PartyProps = {
   onStart: () => void;
@@ -13,9 +14,10 @@ type PartyProps = {
   onSetGameSettings?: (value: GameSettings) => void;
   hostID?: string;
   partyID?: string;
+  players?: Player[];
 };
 
-export default function Party({ onGoHome, partySettings, onSetGameSettings, onStart }: PartyProps) {
+export default function Party({ onGoHome, partySettings, onSetGameSettings, players, onStart }: PartyProps) {
     // LOCAL STATES
     const [gamePreferences, setGamePreferences] = useState<GamePreferences>({ noOfStatements: 5, difficulty: "easy" });
 
@@ -34,12 +36,27 @@ export default function Party({ onGoHome, partySettings, onSetGameSettings, onSt
 
         <Separator />
 
-        <CardContent>
+        <CardContent className="flex flex-col gap-2">
 
-            <Item>
-                <ItemHeader>Players</ItemHeader>
-                <ItemContent className="flex gap-2 items-center justify-center w-full">
+            <Item variant="muted" className="flex flex-col font-semibold">
+                <ItemContent>
+                    Party Code: {partySettings?.partyCode}
+                </ItemContent>
+            </Item>
+
+            <Item variant="outline">
+                <ItemHeader>Party Room</ItemHeader>
+                <ItemContent>
+                    <div className="flex gap-2 items-center flex-wrap">
                     {/* List of players ready to play */}
+                    <Item variant="outline" className="w-fit">
+                        <Star className="size-4" />
+                        {partySettings?.hostName}
+                    </Item>
+                    {players?.map((player) => (
+                        <Item key={player.id} variant="outline" className="w-fit">{player.name}</Item>
+                    ))}
+                    </div>
                 </ItemContent>
             </Item>
 

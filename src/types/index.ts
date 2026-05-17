@@ -4,6 +4,11 @@ export type Statement = {
   img?: string;
 };
 
+export type Player = {
+  name : string;
+  id : string;
+};
+
 export type PlayerGuess = {
   statement: string;
   actualYear: number;
