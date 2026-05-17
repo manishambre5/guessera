@@ -29,6 +29,7 @@ export type GameSettings = GamePreferences & {
 };
 
 export type PartySettings = {
-  noOfStatements: number;
-  difficulty: GameDifficulty;
+  hostName?: string;
+  partyName?: string;
+  partyCode?: string;
 };
