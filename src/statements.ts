@@ -41,5 +41,13 @@ export const statements: Statement[] = [
 
   { statement: "Ying Zheng, also known as Qin Shi Huang, the king of Qin unifies China and proclaims himself the First Emperor, ending the Warring States period.", year: "-220", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/QinShiHuang19century.jpg/960px-QinShiHuang19century.jpg" },
 
+  { statement: "Hatshepsut was the sixth pharaoh of the Eighteenth Dynasty of Egypt, ruling first as regent, then as queen regnant from...", year: "-1478", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Seated_Statue_of_Hatshepsut_MET_Hatshepsut2012.jpg/960px-Seated_Statue_of_Hatshepsut_MET_Hatshepsut2012.jpg" },
+
+  { statement: "Signs of a gradual decline began to emerge in the Indus Valley Civilisation around...", year: "-1899", img: "https://upload.wikimedia.org/wikipedia/commons/d/df/Mohenjo-daro_Priesterk%C3%B6nig.jpeg" },
+
+  { statement: "Sargon of Akkad, sometimes identified as the first person in recorded history to rule over an empire, established the Akkadian Empire around...", year: "-2333", img: "https://upload.wikimedia.org/wikipedia/commons/f/f2/Sargon_of_Akkad_on_his_victory_stele.jpg" },
+
+  { statement: "The construction of Angkor Wat in the capital city of the Khmer Empire, commenced in...", year: "1122", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/Buddhist_monks_in_front_of_the_Angkor_Wat.jpg/1280px-Buddhist_monks_in_front_of_the_Angkor_Wat.jpg" },
+
   //{ statement: "", year: "", img: "" },
 ];

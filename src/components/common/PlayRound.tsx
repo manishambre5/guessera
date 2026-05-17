@@ -8,7 +8,8 @@ import { Button } from "../ui/button";
 import type { GameRoundReport, GameSettings, PlayerGuess, Statement } from "@/types";
 import Countdown from "./Countdown";
 import formatYear from "@/utils/formatYear";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Image, ImageOff } from "lucide-react";
+import { Skeleton } from "../ui/skeleton";
 
 type PlayRoundProps = {
   gameSettings?: GameSettings;
@@ -23,6 +24,8 @@ export default function PlayRound({ onRoundEnd, gameSettings }: PlayRoundProps) 
     const [playerGuesses, setPlayerGuesses] = useState<PlayerGuess[]>([]);
     const [score, setScore] = useState<number>(0);
     const [round, setRound] = useState<number>(0); // to reset round timer
+    const [loading, setLoading] = useState<boolean>(true); // to render a skeleton while loading
+    const [imgError, setImgError] = useState<boolean>(false); // to render a skeleton if image can't be loaded
 
     // REFs
     const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null); // for smooth hold and press speed increase
@@ -178,16 +181,35 @@ export default function PlayRound({ onRoundEnd, gameSettings }: PlayRoundProps) 
         <section className="flex-1 flex flex-col items-center">
 
             {chosenStatements.length > 0 && currentStatementIndex < chosenStatements.length ? (
-                    <Card className="flex-1 flex flex-col justify-center relative w-full pt-0">
-                    {chosenStatements[currentStatementIndex].img?.trim() &&
+                <Card className="flex-1 flex flex-col justify-center relative w-full pt-0">
+                    {chosenStatements[currentStatementIndex].img?.trim() ? (
                         <div className="flex-1 relative">
-                            <img
-                                src={chosenStatements[currentStatementIndex].img}
-                                className="absolute inset-0 size-full object-cover brightness-60 dark:brightness-40"
-                                alt="Event cover"
-                            />
+                            {loading && (
+                                <Skeleton className="m-2 h-full flex items-center justify-center">
+                                    <Image className="text-chart-1 size-16" />
+                                </Skeleton>
+                            )}
+                            {imgError ? (
+                                <Skeleton className="m-2 h-full flex items-center justify-center animate-none">
+                                    <ImageOff className="text-chart-1 size-16" />
+                                </Skeleton>
+                            ) : (
+                                <img
+                                    src={chosenStatements[currentStatementIndex].img}
+                                    className={`absolute inset-0 size-full object-cover brightness-60 dark:brightness-40`}
+                                    onLoad={() => setLoading(false)}
+                                    onError={() => {
+                                        setImgError(true);
+                                        setLoading(false);
+                                    }}
+                                />
+                            )}
                         </div>
-                    }
+                    ) : (
+                        <Skeleton className="m-2 h-full flex items-center justify-center">
+                            <ImageOff className="text-chart-1 size-16" />
+                        </Skeleton>
+                    )}
                     <CardHeader className="h-fit">
                         <CardTitle className="text-xl text-center">{chosenStatements[currentStatementIndex].statement}</CardTitle>
                     </CardHeader>
