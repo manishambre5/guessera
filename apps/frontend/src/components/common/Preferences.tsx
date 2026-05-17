@@ -4,7 +4,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui/colla
 import { Field, FieldLabel, FieldSet } from "../ui/field";
 import { Item, ItemContent } from "../ui/item";
 import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group";
-import type { GameDifficulty, GamePreferences } from "@/types";
+import type { GameDifficulty, GamePreferences } from "@guessera/types";
 import { useState } from "react";
 
 type PreferencesProps = {

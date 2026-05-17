@@ -1,40 +1,53 @@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
-import { Item, ItemContent, ItemHeader } from "../ui/item";
-import type { PartySettings } from "@/types";
+import { Item } from "../ui/item";
+import type { PartySettings } from "@guessera/types";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { socket } from "@/utils/socket";
 
 type CreatePartyProps = {
-  onCreateParty?: () => void;
+  onCreateParty: () => void;
   onGoHome: () => void;
-  onSetPartySettings?: (value: PartySettings) => void;
-  hostID?: string;
-  partyID?: string;
+  onSetPartySettings: (value: PartySettings) => void;
 };
 
 export default function CreateParty({ onCreateParty, onSetPartySettings, onGoHome }: CreatePartyProps) {
     // LOCAL STATES
     const [hostName, setHostName] = useState<string>("");
     const [partyName, setPartyName] = useState<string>("");
-    const [partyCode, setPartyCode] = useState<string>("");
 
     // HANDLERS
-    const handleCreateParty = () => {
+    const handleCreateParty = (e: React.SubmitEvent) => {
+        e.preventDefault();
+
         if (!hostName.trim() || !partyName.trim()) {
-            alert("Please fill in both fields");
+            alert("Please fill in both fields!");
             return;
         }
 
-        // Generate random 4-character party code
-        const code = Math.random().toString(36).substring(2, 6).toUpperCase();
-        setPartyCode(code);
-
-        onSetPartySettings?.({ hostName, partyName, partyCode: code });
-        onCreateParty?.();
+        // Send party room creation request to server
+        socket.emit("create_party", { hostName, partyName });
     };
+
+    useEffect(() => {
+        socket.connect();
+
+        // Listen for the server successfully creating our party room
+        socket.on("party_created", (liveParty: PartySettings) => {
+            // Update the parent component's state with the live, synchronized data
+            onSetPartySettings?.(liveParty);
+            // Go to party room screen
+            onCreateParty?.();
+        });
+
+        // Listner clean up code
+        return () => {
+            socket.off("party_created");
+        };
+    }, [onCreateParty, onSetPartySettings]);
 
   return (
     <Card className="lg:w-1/2 w-full">
@@ -46,7 +59,7 @@ export default function CreateParty({ onCreateParty, onSetPartySettings, onGoHom
         <Separator />
 
         <CardContent>
-            <form className="flex flex-col items-center justify-center">
+            <form id="handleCreateParty-form" onSubmit={handleCreateParty} className="flex flex-col items-center justify-center">
 
             <Item>
                 <div className="flex gap-2 items-center justify-center w-full">
@@ -75,18 +88,11 @@ export default function CreateParty({ onCreateParty, onSetPartySettings, onGoHom
                 </div>
             </Item>
 
-            <Item variant="outline" className="w-full">
-                <ItemHeader>Share the Party code with your friends so they can join!</ItemHeader>
-                <ItemContent>
-                    {partyCode && <p className="text-2xl text-center">{partyCode}</p>}
-                </ItemContent>
-            </Item>
-
             </form>
         </CardContent>
         <CardFooter>
             <div className="flex items-center justify-center gap-4 w-full">
-                <Button size="lg" onClick={handleCreateParty}>Create Party</Button>
+                <Button size="lg" form="handleCreateParty-form" type="submit">Create Party</Button>
                 <Button size="lg" onClick={onGoHome}>Home</Button>
             </div>
         </CardFooter>

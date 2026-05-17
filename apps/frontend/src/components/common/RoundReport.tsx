@@ -1,4 +1,4 @@
-import type { GameRoundReport, PlayerGuess } from "@/types";
+import type { GameRoundReport, PlayerGuess } from "@guessera/types";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "../ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";

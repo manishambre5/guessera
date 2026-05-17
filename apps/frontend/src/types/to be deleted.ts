@@ -7,6 +7,8 @@ export type Statement = {
 export type Player = {
   name : string;
   id : string;
+  isHost: boolean;
+  score?: number;
 };
 
 export type PlayerGuess = {
@@ -34,7 +36,9 @@ export type GameSettings = GamePreferences & {
 };
 
 export type PartySettings = {
-  hostName?: string;
-  partyName?: string;
-  partyCode?: string;
+  hostName: string;
+  partyName: string;
+  partyCode: string;
+  players?: Player[];
+  gameStarted?: boolean;
 };

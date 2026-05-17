@@ -1,14 +1,16 @@
 import { useState } from 'react';
 import GameSetup from './components/common/GameSetup';
 import PlayRound from './components/common/PlayRound';
-import type { GameRoundReport, GameSettings, MultiPlayerAction, PartySettings, Player } from './types';
+import type { GameRoundReport, GameSettings, MultiPlayerAction, PartySettings } from '@guessera/types';
 import RoundReport from './components/common/RoundReport';
 import CreateParty from './components/multiplayer/CreateParty';
 import JoinParty from './components/multiplayer/JoinParty';
 import Party from './components/multiplayer/Party';
+import { socket } from './utils/socket';
 
 
 function App() {
+  // STATES
   const [playing, setPlaying] = useState<boolean>(false);
   const [partying, setPartying] = useState<boolean>(false);
   const [multiplayerAction, setMultiplayerAction] = useState<MultiPlayerAction>();
@@ -16,23 +18,20 @@ function App() {
   const [gameRoundScore, setGameRoundScore] = useState<GameRoundReport | null>(null);
   const [gameSettings, setGameSettings] = useState<GameSettings>();
   const [partySettings, setPartySettings] = useState<PartySettings>();
-  
-  // mock list of players for multiplayer party
-  const mock: Player[] = [
-    { id: "p3", name: "Charlie" },
-    { id: "p4", name: "Ila" },
-  ];
 
+
+  // HANDLERS
   const handleGameRoundEnd = (report: {finalScore: number}) => {
     setGameRoundScore(report);
     setPlaying(false);
   }
 
-
   const handleGoHome = () => {
-    setGameRoundScore(null);  // reset game round report state
+    socket.emit("leave_party"); // Tell the server about leaving the room before wiping frontend state
+    setGameRoundScore(null);
     setMultiplayerMode(false);
     setPartying(false);
+    setPartySettings(undefined);
   };
 
 
@@ -57,13 +56,13 @@ function App() {
             />
           ) : ( // player hasn't played yet
             multiplayerMode ? ( // player is on multi player mode
-              partying ? ( // player is in a party
+              partying && partySettings ? ( // player is in a party
                 <Party
                   onGoHome={handleGoHome}
                   partySettings={partySettings}
                   onSetGameSettings={setGameSettings}
                   onStart={() => setPlaying(true)}
-                  players={mock}
+                  onUpdatePartySettings={setPartySettings}
                 />
               ) : ( // player isn't in a party yet
                 multiplayerAction === "create" ? ( // player clicked create
@@ -76,6 +75,7 @@ function App() {
                   <JoinParty
                     onGoHome={handleGoHome}
                     onJoinParty={() => setPartying(true)}
+                    onPartySettings={setPartySettings}
                   />
                 )
               )
@@ -91,50 +91,6 @@ function App() {
             )
           )
         )}
-        {/*!playing ? ( // player not playing a game
-          gameRoundScore ? ( // player has finished playing a game
-            <RoundReport
-              report={gameRoundScore}
-              onGoHome={handleGoHome}
-            />
-          ) : ( // player hasn't played a game yet
-            !multiplayerMode ? ( // player is on single player mode
-              <GameSetup
-                onStart={() => setPlaying(true)}
-                onMultiplayerMode={(value: MultiPlayerAction) => {
-                  setMultiplayerMode(true);
-                  setMultiplayerAction(value);
-                }}
-                onSetGameSettings={setGameSettings}
-              />              
-            ) : ( // player is on multiplayer mode
-              multiplayerAction === "create" ? ( // player clicked create
-                <CreateParty
-                  onGoHome={handleGoHome}
-                  onSetPartySettings={setPartySettings}
-                  onCreateParty={() => setPartying(true)}
-                />
-              ) : ( // player clicked join
-                <JoinParty
-                  onGoHome={handleGoHome}
-                  onJoinParty={() => setPartying(true)}
-                />
-              )
-              partying && (
-                <Party
-                  onGoHome={handleGoHome}
-                  partySettings={partySettings}
-                />
-              )
-              )
-            )
-          )
-        ) : ( // player is playing a game
-          <PlayRound
-            onRoundEnd={handleGameRoundEnd}
-            gameSettings={gameSettings}
-          />
-        )*/}
       </div>
     </div>
   );

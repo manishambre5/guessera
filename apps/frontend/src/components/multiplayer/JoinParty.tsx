@@ -2,35 +2,61 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
 import { Item } from "../ui/item";
-import type { PartySettings } from "@/types";
+import type { PartySettings } from "@guessera/types";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { socket } from "@/utils/socket";
 
 type JoinPartyProps = {
-  onJoinParty?: () => void;
+  onJoinParty: () => void;
   onGoHome: () => void;
-  onPartySettings?: (value: PartySettings) => void;
-  hostID?: string;
-  partyID?: string;
+  onPartySettings: (value: PartySettings) => void;
 };
 
-export default function JoinParty({ onGoHome, onJoinParty }: JoinPartyProps) {
+export default function JoinParty({ onGoHome, onJoinParty, onPartySettings }: JoinPartyProps) {
     // LOCAL STATES
     const [playerName, setPlayerName] = useState<string>("");
     const [partyCode, setPartyCode] = useState<string>("");
+    const [error, setError] = useState<string>("");
 
     // HANDLERS
-    const handleJoinParty = () => {
+    const handleJoinParty = (e: React.SubmitEvent) => {
+        e.preventDefault();
+        setError(""); // clear old errors
+
         if (!playerName.trim() || !partyCode.trim()) {
-            alert("Please fill in both fields");
+            alert("Please fill in both fields!");
             return;
         }
 
-        // TODO: Error handling for party code
-
-        onJoinParty?.();
+        // Send the join party request to server
+        socket.emit("join_party", { 
+            partyCode: partyCode.trim(), 
+            playerName: playerName.trim() 
+        });
     };
+
+    useEffect(() => {
+        socket.connect();
+
+        // When successfully added to the room, the server responds with the updated party object
+        socket.on("party_updated", (liveParty: PartySettings) => {
+            onPartySettings?.(liveParty);
+            onJoinParty?.(); // Go to the Party room layout
+        });
+
+        // Listen for validation errors from the server
+        socket.on("error_message", (msg: string) => {
+            setError(msg);
+        });
+
+        // Listner clean up code
+        return () => {
+            socket.off("party_updated");
+            socket.off("error_message");
+        };
+    }, [onJoinParty, onPartySettings]);
 
   return (
     <Card className="lg:w-1/2 w-full">
@@ -42,7 +68,7 @@ export default function JoinParty({ onGoHome, onJoinParty }: JoinPartyProps) {
         <Separator />
 
         <CardContent>
-            <form className="flex flex-col items-center justify-center">
+            <form id="handleJoinParty-form" onSubmit={handleJoinParty} className="flex flex-col items-center justify-center">
 
             <Item>
                 <div className="flex gap-2 items-center justify-center w-full">
@@ -71,11 +97,15 @@ export default function JoinParty({ onGoHome, onJoinParty }: JoinPartyProps) {
                 </div>
             </Item>
 
+            {error && (
+                <p className="text-sm font-medium text-destructive bg-destructive/10 px-3 py-2 rounded-md w-full text-center">{error}</p>
+            )}
+
             </form>
         </CardContent>
         <CardFooter>
             <div className="flex items-center justify-center gap-4 w-full">
-                <Button size="lg" onClick={handleJoinParty}>Join Party</Button>
+                <Button size="lg" form="handleJoinParty-form" type="submit">Join Party</Button>
                 <Button size="lg" onClick={onGoHome}>Home</Button>
             </div>
         </CardFooter>

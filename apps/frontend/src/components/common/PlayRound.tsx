@@ -5,7 +5,7 @@ import { Field, FieldLabel, FieldSeparator } from "../ui/field";
 import { Slider } from "../ui/slider";
 import { statements } from "@/statements";
 import { Button } from "../ui/button";
-import type { GameRoundReport, GameSettings, PlayerGuess, Statement } from "@/types";
+import type { GameRoundReport, GameSettings, PlayerGuess, Statement } from "@guessera/types";
 import Countdown from "./Countdown";
 import formatYear from "@/utils/formatYear";
 import { ChevronLeft, ChevronRight, Image, ImageOff } from "lucide-react";

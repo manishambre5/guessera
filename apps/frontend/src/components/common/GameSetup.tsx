@@ -4,7 +4,7 @@ import { Button } from "../ui/button";
 import { FieldGroup, FieldSet } from "../ui/field";
 import { Separator } from "../ui/separator";
 import { useState } from "react";
-import { type GamePreferences, type GameMode, type GameSettings, type MultiPlayerAction } from "@/types";
+import { type GamePreferences, type GameMode, type GameSettings, type MultiPlayerAction } from "@guessera/types";
 import Preferences from "./Preferences";
 
 type GameSetupProps = {
