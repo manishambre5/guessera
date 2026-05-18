@@ -33,6 +33,7 @@ export type GamePreferences = {
 }
 export type GameSettings = GamePreferences & {
   mode: GameMode;
+  statements?: Statement[];
 };
 
 export type PartySettings = {

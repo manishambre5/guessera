@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { Star } from "lucide-react";
 import { socket } from "@/utils/socket";
 import { Copyable } from "../ui/copyable";
+import pickRandomStatements from "@/utils/pickRandomStatements";
 
 type PartyProps = {
   onStart: () => void;
@@ -25,8 +26,21 @@ export default function Party({ onGoHome, partySettings, onSetGameSettings, onUp
 
     // HANDLERS
     const handleStartGame = () => {
+        // Only host can start a game (at least for now)
         if (!isHost) return;
-        onSetGameSettings?.({ mode: "multi", ...gamePreferences });
+
+        // Generate shared set of statements for a multiplayer game
+        const totalStatements = gamePreferences.noOfStatements ?? 5;
+        const synchedStatements = pickRandomStatements(totalStatements);
+
+        // combining settings and statements together
+        const multiplayerGameSettings: GameSettings = {
+            mode: "multi",
+            ...gamePreferences,
+            statements: synchedStatements
+        };
+
+        onSetGameSettings?.(multiplayerGameSettings);
 
         socket.emit("start_game",{
             partyCode: partySettings.partyCode,

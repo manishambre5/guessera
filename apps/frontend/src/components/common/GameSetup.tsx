@@ -46,6 +46,7 @@ function GameSetup({ onStart, onMultiplayerMode, onSetGameSettings }: GameSetupP
                             size="lg"
                             className="w-full"
                             defaultValue="single"
+                            value={mode}
                             onValueChange={(value) => {
                                 if (value) {
                                     setMode(value as GameMode);
