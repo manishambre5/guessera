@@ -98,7 +98,7 @@ export default function JoinParty({ onGoHome, onJoinParty, onPartySettings }: Jo
             </Item>
 
             {error && (
-                <p className="text-sm font-medium text-destructive bg-destructive/10 px-3 py-2 rounded-md w-full text-center">{error}</p>
+                <Item className="text-destructive bg-destructive/10 flex flex-col w-fit">{error}</Item>
             )}
 
             </form>

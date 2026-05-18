@@ -45,7 +45,6 @@ function App() {
 
       // Launch gameplay for guest
       setPlaying(true);
-      console.log(playing);
     });
 
     return (() => {
@@ -60,7 +59,7 @@ function App() {
       <div className="absolute inset-0 bg-black/50" />
 
       <div className='flex flex-col gap-2 h-screen w-screen items-center justify-center p-2 relative z-10'>
-        {playing ? ( // player is playing a game
+        {playing && gameSettings ? ( // player is playing a game
           <PlayRound
             onRoundEnd={handleGameRoundEnd}
             gameSettings={gameSettings}

@@ -35,8 +35,8 @@ export default function Party({ onGoHome, partySettings, onSetGameSettings, onUp
 
         // combining settings and statements together
         const multiplayerGameSettings: GameSettings = {
-            mode: "multi",
             ...gamePreferences,
+            mode: "multi",
             statements: synchedStatements
         };
 
@@ -44,7 +44,7 @@ export default function Party({ onGoHome, partySettings, onSetGameSettings, onUp
 
         socket.emit("start_game",{
             partyCode: partySettings.partyCode,
-            settings: { mode: "multi", ...gamePreferences }
+            settings: (multiplayerGameSettings)
         });
 
         onStart();
@@ -116,7 +116,7 @@ export default function Party({ onGoHome, partySettings, onSetGameSettings, onUp
             )}
 
             {error &&
-                <p className="text-sm font-medium text-destructive bg-destructive/10 px-3 py-2 rounded-md w-full text-center">{error}</p>
+                <Item className="text-destructive bg-destructive/10 flex flex-col w-fit">{error}</Item>
             }
 
         </CardContent>

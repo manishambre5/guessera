@@ -121,11 +121,13 @@ export default function PlayRound({ onRoundEnd, gameSettings }: PlayRoundProps) 
 
 
     useEffect(() => {
+        // TODO: Move this to the server since this is pretty easily hackable
         if (gameSettings?.mode === "multi" && gameSettings?.statements) {
             setChosenStatements(gameSettings.statements);
-        } else setChosenStatements(pickRandomStatements(gameSettings?.noOfStatements ?? 5)); // pick 'n' random statements if a statements set doesn't exist (i.e. it's a single player game)
-
-        // TODO: Move this to the server since this is pretty easily hackable
+            console.log("using shared set");
+        } else { // pick 'n' random statements if a statements set doesn't exist (i.e. it's a single player game)
+            setChosenStatements(pickRandomStatements(gameSettings?.noOfStatements ?? 5));
+        }
     }, []);
 
 
@@ -191,7 +193,7 @@ export default function PlayRound({ onRoundEnd, gameSettings }: PlayRoundProps) 
                     </CardHeader>
                 </Card>
                 ) : (
-                    <span className="pl-4">Nothing left to guess :(</span>
+                    <Item className="text-destructive bg-destructive/10 flex flex-col w-fit">Nothing left to guess :(</Item>
                 )}
         </section>
 

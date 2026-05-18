@@ -91,12 +91,12 @@ io.on("connection", (socket) => {
     const party = parties[code];
 
     if (!party) {
-      socket.emit("error_message", "Party not found! Double check your code.");
+      socket.emit("error_message", "Can't find Party! Double check your code.");
       return;
     }
 
     if (party.gameStarted) {
-      socket.emit("error_message", "This game has already started!");
+      socket.emit("error_message", "This party is in the midst of a game! Please try later. Or after the developer has added spectator support.");
       return;
     }
 
