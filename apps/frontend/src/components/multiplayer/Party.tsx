@@ -27,7 +27,7 @@ export default function Party({ onGoHome, partySettings, onSetGameSettings, onUp
         if (!isHost) return;
         onSetGameSettings?.({ mode: "multi", ...gamePreferences });
 
-        // TODO: In the next step, emit a "start_game" event to the server here so that it forces all connected guests to transition to the game board at once.
+        // TODO: emit a "start_game" event to the server to force all connected guests to transition to the gameplay round.
 
         onStart();
     }

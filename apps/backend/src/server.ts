@@ -10,7 +10,7 @@ app.use(cors());
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: "*", // Open for local area network testing
+    origin: "*", // Open for LAN testing
     methods: ["GET", "POST"]
   }
 });
@@ -23,7 +23,7 @@ const generateRoomCode = (): string => {
   return Math.random().toString(36).substring(2, 6).toUpperCase();
 };
 
-// CENTRALIZED EXIT HANDLER (Used for both Disconnects and Manual Leaves)
+// CENTRALIZED EXIT HANDLER (for both Disconnects and Manual exits)
 const handlePlayerLeave = (socketId: string, io: any) => {
   for (const code in parties) {
     const party = parties[code];
@@ -31,28 +31,27 @@ const handlePlayerLeave = (socketId: string, io: any) => {
 
     if (playerIndex !== -1) {
       const removedPlayer = party.players[playerIndex];
-      party.players.splice(playerIndex, 1); // Remove from our tracking array
+      party.players.splice(playerIndex, 1); // Remove from tracking array
 
       console.log(`Removed ${removedPlayer.name} from room ${code}.`);
 
-      // Case A: Room is empty -> delete it entirely
+      // Case A: Delete Room if empty
       if (party.players.length === 0) {
         delete parties[code];
         console.log(`Room ${code} deleted because it is empty.`);
       } 
-      // Case B: Room still has active players
+      // Case B: Room not empty
       else {
-        // If the host left, dynamically promote the next person in line
+        // Promote next player in line to host if the host exits the room
         if (removedPlayer.isHost) {
           party.players[0].isHost = true;
           party.hostName = party.players[0].name;
           console.log(`Host left room ${code}. Promoted ${party.players[0].name} to Host.`);
-        }
-        
-        // Notify everyone remaining in the room channel to re-render rosters
+        }        
+        // Notify everyone else in the room
         io.to(code).emit("party_updated", party);
       }
-      break; // Found the user, exit loop execution
+      break;
     }
   }
 };
@@ -60,7 +59,7 @@ const handlePlayerLeave = (socketId: string, io: any) => {
 io.on("connection", (socket) => {
   console.log(`User connected: ${socket.id}`);
 
-  // 1. CREATE PARTY
+  // CREATE PARTY
   socket.on("create_party", ({ hostName, partyName }: { hostName: string; partyName: string }) => {
     const partyCode = generateRoomCode();
     
@@ -86,7 +85,7 @@ io.on("connection", (socket) => {
     socket.emit("party_created", newParty);
   });
 
-  // 2. JOIN PARTY
+  // JOIN PARTY
   socket.on("join_party", ({ partyCode, playerName }: { partyCode: string; playerName: string }) => {
     const code = partyCode.toUpperCase();
     const party = parties[code];
@@ -115,14 +114,14 @@ io.on("connection", (socket) => {
     io.to(code).emit("party_updated", party);
   });
 
-  // 3. MANUAL LEAVE LOBBY
+  // MANUAL EXIT PARTY ROOM
   socket.on("leave_party", () => {
     console.log(`Manual leave triggered by client: ${socket.id}`);
     
-    // Process list tracking removal
+    // Process list tracking removal of player
     handlePlayerLeave(socket.id, io);
 
-    // FIX: Safely convert the socket.rooms Set into an Array before unlinking channel
+    // Converting the socket.rooms Set into an Array before unlinking channel
     const activeRooms = Array.from(socket.rooms);
     activeRooms.forEach((room) => {
       if (room !== socket.id) {
@@ -132,13 +131,15 @@ io.on("connection", (socket) => {
     });
   });
 
-  // 4. UNINTENTIONAL DISCONNECT & ROOM CLEANUP
+  // UNINTENTIONAL DISCONNECT & ROOM CLEANUP
   socket.on("disconnect", () => {
     console.log(`User disconnected naturally: ${socket.id}`);
-    // Clean, single execution call. No duplicate redundant block underneath.
     handlePlayerLeave(socket.id, io);
   });
 });
+
+
+
 
 const PORT = 3001;
 httpServer.listen(PORT, "0.0.0.0" , () => {
