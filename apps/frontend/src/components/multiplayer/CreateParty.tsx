@@ -35,7 +35,7 @@ export default function CreateParty({ onCreateParty, onSetPartySettings, onGoHom
     useEffect(() => {
         socket.connect();
 
-        // Listen for the server successfully creating our party room
+        // Listen for the server successfully creating a party room
         socket.on("party_created", (liveParty: PartySettings) => {
             // Update the parent component's state with the live, synchronized data
             onSetPartySettings?.(liveParty);

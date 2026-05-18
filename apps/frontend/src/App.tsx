@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import GameSetup from './components/common/GameSetup';
 import PlayRound from './components/common/PlayRound';
 import type { GameRoundReport, GameSettings, MultiPlayerAction, PartySettings } from '@guessera/types';
@@ -35,6 +35,23 @@ function App() {
   };
 
 
+  useEffect(() => {
+    // Listen for the host starting a multiplayer game
+    socket.on("game_started", (incomingSettings: GameSettings) => {
+      console.log("The host has started a game! Syncing settings...");
+
+      // Force the host's game config rules
+      setGameSettings(incomingSettings);
+
+      // Launch gameplay for guest
+      setPlaying(true);
+      console.log(playing);
+    });
+
+    return (() => {
+      socket.off("game_started");
+    });
+  }, []);
 
   return (
     <div className="relative h-screen overflow-hidden">

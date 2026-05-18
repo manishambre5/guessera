@@ -10,6 +10,7 @@ import Countdown from "./Countdown";
 import formatYear from "@/utils/formatYear";
 import { ChevronLeft, ChevronRight, Image, ImageOff } from "lucide-react";
 import { Skeleton } from "../ui/skeleton";
+import calculateScore from "@/utils/calculateScore";
 
 type PlayRoundProps = {
   gameSettings?: GameSettings;
@@ -75,21 +76,6 @@ export default function PlayRound({ onRoundEnd, gameSettings }: PlayRoundProps) 
         }
     };
 
-    // Score calculation logic
-    function calculateScore(guess: number, actual: number): number {
-        const maxDifference = 2000;
-        const maxScore = 1000;
-        const difference = Math.abs(guess - actual);
-
-        if (difference >= maxDifference) return 0;
-
-        // exponential scoring to reward close guesses well
-        const normalized = 1 - difference / maxDifference; // 1.0 perfect, 0.0 at maxDiff
-        const result = Math.round(maxScore * Math.pow(normalized, 3)); // cubic/exponential curve
-
-        return result;
-    }
-
     // Slider thumb arrow button control
     const moveSliderThumb = (direction: boolean): void => {
         setSliderValue((prev) => {
@@ -146,7 +132,6 @@ export default function PlayRound({ onRoundEnd, gameSettings }: PlayRoundProps) 
                     chosenStatements.push(statements[randomIndex]);
                 }
             }
-            console.log(chosenStatements);
             return chosenStatements;
         }
         setChosenStatements(pickRandomStatements(gameSettings?.noOfStatements ?? 5));

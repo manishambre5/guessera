@@ -7,6 +7,7 @@ import Preferences from "../common/Preferences";
 import { useEffect, useState } from "react";
 import { Star } from "lucide-react";
 import { socket } from "@/utils/socket";
+import { Copyable } from "../ui/copyable";
 
 type PartyProps = {
   onStart: () => void;
@@ -27,7 +28,10 @@ export default function Party({ onGoHome, partySettings, onSetGameSettings, onUp
         if (!isHost) return;
         onSetGameSettings?.({ mode: "multi", ...gamePreferences });
 
-        // TODO: emit a "start_game" event to the server to force all connected guests to transition to the gameplay round.
+        socket.emit("start_game",{
+            partyCode: partySettings.partyCode,
+            settings: { mode: "multi", ...gamePreferences }
+        });
 
         onStart();
     }
@@ -67,9 +71,10 @@ export default function Party({ onGoHome, partySettings, onSetGameSettings, onUp
 
         <CardContent className="flex flex-col gap-2">
 
-            <Item variant="muted" className="flex flex-col font-semibold">
-                <ItemContent>
-                    Party Code: {partySettings.partyCode}
+            <Item variant="muted" className="flex flex-col">
+                <ItemContent className="flex flex-row items-center gap-2">
+                    <p className="text-muted-foreground">Party Code:</p>
+                    <Copyable target={partySettings.partyCode} />
                 </ItemContent>
             </Item>
 

@@ -114,6 +114,22 @@ io.on("connection", (socket) => {
     io.to(code).emit("party_updated", party);
   });
 
+  // START GAME
+  socket.on("start_game", ({ partyCode, settings }) => {
+    const code = partyCode.toUpperCase();
+    const party = parties[code];
+
+    if (party) {
+      // Prevent new players from joining an ongoing game
+      party.gameStarted = true;
+
+      console.log(`Starting a multiplayer game for room: ${code}`);
+
+      // Tell everyone in the room except the host (who transitions first)
+      socket.to(code).emit("game_started", settings);
+    }
+  })
+
   // MANUAL EXIT PARTY ROOM
   socket.on("leave_party", () => {
     console.log(`Manual leave triggered by client: ${socket.id}`);
