@@ -34,6 +34,7 @@ function App() {
     setGameRoundScore(null);
     setPartyRoomLeaderboard(null);
     setPartySettings(undefined);
+    setRoundHistory([]);
   };
 
   const handleGoBackToRoom = () => {
@@ -44,7 +45,7 @@ function App() {
 
   useEffect(() => {
     socket.connect();
-    
+
     // remove before adding to prevent duplicates
     socket.off("game_started");
     socket.off("game_over_leaderboard");
@@ -83,8 +84,10 @@ function App() {
 
     // Listen for player array changes (joins, leaves, host switches)
     socket.on("party_updated", (updatedParty: PartySettings) => {
-      console.log("party_updated received, players:", updatedParty.players.map(p => `${p.name}: ${p.score}`));
-      setPartySettings(updatedParty);
+      const isInParty = updatedParty.players.some(p => p.id === socket.id);
+      if (isInParty) {
+        setPartySettings(updatedParty);
+      }
     });
 
     return (() => {
