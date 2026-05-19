@@ -29,7 +29,7 @@ export function Copyable({
   };
 
   return (
-    <Item variant="outline" className={`flex-1 ${className}`}>
+    <Item variant="muted" className={`flex-1 ${className}`}>
         <p className="font-bold text-lg">{target}</p>
         <Button
             variant="ghost"

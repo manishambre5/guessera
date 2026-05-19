@@ -67,7 +67,9 @@ io.on("connection", (socket) => {
       id: socket.id, 
       name: hostName, 
       isHost: true, 
-      score: 0 
+      score: 0,
+      isPlaying: false,
+      guesses: []
     };
 
     const newParty: Party = {
@@ -104,7 +106,9 @@ io.on("connection", (socket) => {
       id: socket.id,
       name: playerName,
       isHost: false,
-      score: 0
+      score: 0,
+      isPlaying: false,
+      guesses: []
     };
 
     party.players.push(guestPlayer);
@@ -123,10 +127,45 @@ io.on("connection", (socket) => {
       // Prevent new players from joining an ongoing game
       party.gameStarted = true;
 
+      // Flag all player in the room into active gameplay state
+      party.players.forEach((player) => {
+        player.isPlaying = true;
+        player.score = 0; // Reset any old scores
+      });
+
       console.log(`Starting a multiplayer game for room: ${code}`);
 
-      // Tell everyone in the room except the host (who transitions first)
-      socket.to(code).emit("game_started", settings);
+      // Tell everyone in the room
+      io.to(code).emit("game_started", settings);
+    }
+  })
+
+  // SCORE SUBMISSION
+  socket.on("submit_score", ({ partyCode, report }) => {
+    const code = partyCode.toUpperCase();
+    const party = parties[code];
+
+    if (!party) return;
+
+    // find the player who just submitted their score
+    const player = party.players.find(p => p.id === socket.id);
+    if (player) {
+      player.score = report.finalScore;
+      player.guesses = report.roundGuessDetails;
+      player.isPlaying = false;
+      console.log(`Player ${player.name} from party room ${code} has finished and submitted report.`);
+    }
+
+    // check if everyone else has finished their round
+    const allFinished = party.players.every(p => !p.isPlaying);
+
+    if (allFinished) {
+      console.log(`All players in party room ${code} have finished the round. Generating final leaderboard report...`);
+
+      const finalLeaderboard = [...party.players].sort((a, b) => b.score - a.score);
+
+      // broadcast the final leaderboard standings to the entire room simultaneously
+      io.to(code).emit("game_over_leaderboard", finalLeaderboard);
     }
   })
 

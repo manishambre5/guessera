@@ -1,19 +1,23 @@
-import type { GameMode, GameRoundReport, PlayerGuess } from "@guessera/types";
+import type { GameMode, GameRoundReport, PlayerGuess, Statement } from "@guessera/types";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "../ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
+import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "../ui/table";
 import formatYear from "@/utils/formatYear";
 import { Separator } from "../ui/separator";
-import { ScrollArea } from "../ui/scroll-area";
+import { ScrollArea, ScrollBar } from "../ui/scroll-area";
+import { Badge } from "../ui/badge";
+import { socket } from "@/utils/socket";
 
 type GameRoundReportProps = {
+  chosenStatements?: Statement[];
   report: GameRoundReport;
   onGoHome: () => void;
   onGoBackToRoom: () => void;
   mode?: GameMode;
+  leaderboard?: any[];
 };
 
-const RoundReport: React.FC<GameRoundReportProps> = ({ report, onGoHome, onGoBackToRoom, mode }) => {
+const RoundReport: React.FC<GameRoundReportProps> = ({ chosenStatements, report, onGoHome, onGoBackToRoom, mode, leaderboard }) => {
   return (
     <Card className="lg:w-1/2 w-full max-h-screen flex flex-col">
       <CardHeader className="text-center">
@@ -21,33 +25,121 @@ const RoundReport: React.FC<GameRoundReportProps> = ({ report, onGoHome, onGoBac
             Your final score: {report.finalScore}
         </CardTitle>
       </CardHeader>
+
       <Separator />
-      <CardContent className="flex-1 min-h-0">
-        <ScrollArea className="h-full">
-        <Table className="">
-          <TableHeader>
-            <TableRow>
-              <TableHead></TableHead>
-              <TableHead className="">Event</TableHead>
-              <TableHead className="text-center">Year</TableHead>
-              <TableHead className="text-center">Guess</TableHead>
-              <TableHead className="text-center">Score</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {report.roundGuessDetails?.map((item: PlayerGuess, index: number) => (
-              <TableRow key={index}>
-                <TableCell className="text-muted-foreground text-xs text-right">#{index+1}</TableCell>
-                <TableCell className="whitespace-normal md:text-sm text-xs">{item.statement}</TableCell>
-                <TableCell className="text-center">{formatYear(item.actualYear)}</TableCell>
-                <TableCell className="text-center">{formatYear(item.guessedYear)}</TableCell>
-                <TableCell className="text-center bg-accent">{item.guessScore}</TableCell>
+
+      <CardContent className="flex-1 min-h-0 w-full overflow-hidden">
+        <ScrollArea className="h-96 w-full">
+          <Table className="w-full">
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-12"></TableHead>
+                <TableHead className="min-w-50">Event</TableHead>
+                <TableHead className="text-center">Actual Year</TableHead>
+                
+                {mode === "multi" && leaderboard ? (
+                  leaderboard.map((player) => (
+                    <TableHead key={player.id}>
+                      <div className="flex items-center gap-2 justify-center">
+                        <span>{player.name}</span>
+                        {player.id === socket.id &&
+                          <Badge variant="secondary" className="text-background uppercase bg-emerald-300">you</Badge>
+                        }
+                      </div>
+                    </TableHead>
+                  ))
+                ) : (
+                  <>
+                    <TableHead className="text-center">Your Guess</TableHead>
+                    <TableHead className="text-center">Score</TableHead>
+                  </>
+                )}
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {report.roundGuessDetails?.map((item: PlayerGuess, index: number) => {
+                const matchedStatement = chosenStatements?.find(
+                  (s: Statement) => s.id === item.statementId
+                );
+
+                return (
+                  <TableRow key={index}>
+                    <TableCell className="text-muted-foreground text-xs text-right">
+                      #{index + 1}
+                    </TableCell>
+                    
+                    <TableCell className="whitespace-normal md:text-sm text-xs max-w-xs">
+                      {matchedStatement?.statement}
+                    </TableCell>
+                    
+                    <TableCell className="text-center">
+                      {formatYear(Number(matchedStatement?.year))}
+                    </TableCell>
+
+                    {mode === "multi" && leaderboard ? (
+                      leaderboard.map((player) => {
+                        const playerGuess = player.guesses?.[index];
+                        return (
+                          <TableCell key={player.id} className="text-center">
+                            {playerGuess && (
+                              <div className="flex flex-col items-center justify-center gap-1">
+                                <span>
+                                  {formatYear(playerGuess.guessedYear)}
+                                </span>
+                                <Badge variant="secondary">
+                                  +{playerGuess.guessScore}
+                                </Badge>
+                              </div>
+                            )}
+                          </TableCell>
+                        );
+                      })
+                    ) : (
+                      <>
+                        <TableCell className="text-center">
+                          {formatYear(item.guessedYear)}
+                        </TableCell>
+                        <TableCell className="text-center bg-accent font-semibold">
+                          {item.guessScore}
+                        </TableCell>
+                      </>
+                    )}
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+
+            <TableFooter className="bg-muted/50 font-bold">
+              <TableRow>
+                <TableCell></TableCell>
+                <TableCell></TableCell>
+                <TableCell></TableCell>
+                
+                {mode === "multi" && leaderboard ? (
+                  leaderboard.map((player) => (
+                    <TableCell key={player.id} className="text-center font-bold">
+                      {player.score}
+                    </TableCell>
+                  ))
+                ) : (
+                  <>
+                    <TableCell className="text-center text-muted-foreground text-xs italic">
+                      Final Tally
+                    </TableCell>
+                    <TableCell className="text-center bg-accent text-accent-foreground font-extrabold">
+                      {report.finalScore}
+                    </TableCell>
+                  </>
+                )}
+              </TableRow>
+            </TableFooter>
+            
+          </Table>
+
+          <ScrollBar />
         </ScrollArea>
       </CardContent>
+
       <CardFooter>
         <div className="flex items-center justify-center gap-4 w-full">
           {mode === "multi" ? (

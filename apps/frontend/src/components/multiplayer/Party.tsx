@@ -1,4 +1,4 @@
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "../ui/card";
+import { Card, CardContent, CardFooter, CardHeader } from "../ui/card";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
 import { Item, ItemContent, ItemHeader } from "../ui/item";
@@ -9,7 +9,6 @@ import { socket } from "@/utils/socket";
 import { Copyable } from "../ui/copyable";
 import pickRandomStatements from "@/utils/pickRandomStatements";
 import Leaderboard from "./Leaderboard";
-import PartyHistory from "./PartyHistory";
 import { Badge } from "../ui/badge";
 
 type PartyProps = {
@@ -73,33 +72,27 @@ export default function Party({ onGoHome, partySettings, onSetGameSettings, onUp
 
   return (
     <Card className="lg:w-1/2 w-full">
-        <CardHeader className="flex items-center justify-between">
-            <CardTitle className="text-2xl">{partySettings.partyName || "unnamed"} Party</CardTitle>
-
-            <Item variant="muted" size="xs" className="w-fit flex flex-col">
-                <ItemContent className="flex flex-row items-center">
-                    <p className="text-muted-foreground px-2">Party Code:</p>
-                    <Copyable target={partySettings.partyCode} />
-                </ItemContent>
-            </Item>
-        </CardHeader>
-
-        <Separator />
-
-        <CardContent className="flex flex-col gap-2">
-
-            <Item variant="outline" className="bg-background">
-                <ItemHeader>Party Room ({partySettings.players.length || 0} players)</ItemHeader>
+        <CardHeader className="flex justify-between">
+            <Item variant="outline" className="flex-1">
+                <ItemHeader>
+                    <p className="text-2xl">{partySettings.partyName}</p>
+                    <Item size="xs" className="w-fit flex flex-col">
+                        <ItemContent className="flex flex-row items-center">
+                            <p className="text-muted-foreground px-2">Party Code</p>
+                            <Copyable target={partySettings.partyCode} />
+                        </ItemContent>
+                    </Item>
+                </ItemHeader>
                 <ItemContent>
                     <div className="flex gap-2 items-center flex-wrap">
                         {partySettings.players.map((player) => (
                             <Item key={player.id} variant="outline" size="xs" className="w-fit flex items-center">
-                                <span className="text-xl">{player.name}</span>
+                                <span className="text-lg">{player.name}</span>
                                 {player.isHost &&
-                                    <Badge variant="secondary" className="text-muted-foreground uppercase">host</Badge>
+                                    <Badge variant="secondary" className="text-background uppercase bg-blue-300">host</Badge>
                                 }
                                 {player.id === socket.id &&
-                                    <Badge variant="secondary" className="text-muted-foreground uppercase">you</Badge>
+                                    <Badge variant="secondary" className="text-background uppercase bg-emerald-300">you</Badge>
                                 }
                             </Item>
                         ))}
@@ -107,9 +100,16 @@ export default function Party({ onGoHome, partySettings, onSetGameSettings, onUp
                 </ItemContent>
             </Item>
 
+        </CardHeader>
+
+        <Separator />
+
+        <CardContent className="flex flex-col gap-2">
+
+
             <div className="flex gap-2">
                 <Leaderboard players={partySettings.players} />
-                <PartyHistory />
+                {/*<PartyHistory />*/}
             </div>
 
             {isHost && (
@@ -128,7 +128,7 @@ export default function Party({ onGoHome, partySettings, onSetGameSettings, onUp
                         Start a Game
                     </Button>
                 )}
-                <Button size="lg" onClick={onGoHome}>Home</Button>
+                <Button size="lg" onClick={onGoHome}>Exit Party</Button>
             </div>
         </CardFooter>
     </Card>

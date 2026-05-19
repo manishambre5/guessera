@@ -1,4 +1,5 @@
 export type Statement = {
+  id: string;
   statement : string;
   year : string;
   img?: string;
@@ -9,11 +10,12 @@ export type Player = {
   id : string;
   isHost: boolean;
   score: number;
+  isPlaying: boolean;
+  guesses: PlayerGuess[];
 };
 
 export type PlayerGuess = {
-  statement: string;
-  actualYear: number;
+  statementId: string;
   guessedYear: number;
   guessScore: number;
 };
@@ -25,7 +27,7 @@ export type GameRoundReport = {
 
 export type GameMode = "single" | "multi";
 export type GameDifficulty = "easy" | "medium" | "hard";
-export type MultiPlayerAction = "create" | "join" | null;
+export type MultiPlayerAction = "create" | "join";
 
 export type GamePreferences = {
   noOfStatements: number;

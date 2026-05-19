@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import GameSetup from './components/common/GameSetup';
-import PlayRound from './components/common/PlayRound';
+import Arena from './components/common/Arena';
 import type { GameRoundReport, GameSettings, MultiPlayerAction, PartySettings } from '@guessera/types';
 import RoundReport from './components/common/RoundReport';
 import CreateParty from './components/multiplayer/CreateParty';
@@ -12,30 +12,32 @@ import { socket } from './utils/socket';
 function App() {
   // STATES
   const [playing, setPlaying] = useState<boolean>(false);
-  const [partying, setPartying] = useState<boolean>(false);
   const [multiplayerAction, setMultiplayerAction] = useState<MultiPlayerAction>();
-  const [multiplayerMode, setMultiplayerMode] = useState<boolean>(false);
   const [gameRoundScore, setGameRoundScore] = useState<GameRoundReport | null>(null);
   const [gameSettings, setGameSettings] = useState<GameSettings>();
   const [partySettings, setPartySettings] = useState<PartySettings>();
+  const [partyRoomLeaderboard, setPartyRoomLeaderboard] = useState<any[] | null>(null);
 
 
   // HANDLERS
-  const handleGameRoundEnd = (report: {finalScore: number}) => {
+  const handleGameRoundEnd = (report: GameRoundReport) => {
     setGameRoundScore(report);
-    setPlaying(false);
+    if (gameSettings?.mode !== "multi") {
+      setPlaying(false);
+    }
   }
 
   const handleGoHome = () => {
     socket.emit("leave_party"); // Tell the server about leaving the room before wiping frontend state
+    setMultiplayerAction(undefined);
     setGameRoundScore(null);
-    setMultiplayerMode(false);
-    setPartying(false);
+    setPartyRoomLeaderboard(null);
     setPartySettings(undefined);
   };
 
   const handleGoBackToRoom = () => {
     setGameRoundScore(null);
+    setPartyRoomLeaderboard(null);
   };
 
 
@@ -49,10 +51,23 @@ function App() {
 
       // Launch gameplay for guest
       setPlaying(true);
+
+      // reset any old leaderboards
+      setPartyRoomLeaderboard(null);
     });
+
+    // Catch the final leaderboard report from the server
+     socket.on("game_over_leaderboard", (finalStandings) => {
+       console.log("Leaderboard standings received:", finalStandings);
+       setPartyRoomLeaderboard(finalStandings);
+
+       // exit Arena.tsx and render RoundReport after everyone's done playing
+       setPlaying(false);
+     });
 
     return (() => {
       socket.off("game_started");
+      socket.off("game_over_leaderboard");
     });
   }, []);
 
@@ -64,26 +79,29 @@ function App() {
 
       <div className='flex flex-col gap-2 min-h-screen h-full w-screen items-center justify-center p-2 relative z-10'>
         {playing && gameSettings ? ( // player is playing a game
-          <PlayRound
+          <Arena
             onRoundEnd={handleGameRoundEnd}
             gameSettings={gameSettings}
+            partySettings={partySettings}
           />
         ) : ( // player is not playing a game
           gameRoundScore ? ( // player has just finished playing a game
             <RoundReport
+              chosenStatements={gameSettings?.statements || []}
               report={gameRoundScore}
+              leaderboard={partyRoomLeaderboard || []}
               onGoHome={handleGoHome}
               onGoBackToRoom={handleGoBackToRoom}
               mode={gameSettings?.mode}
             />
           ) : ( // player hasn't played yet
-            multiplayerMode ? ( // player is on multi player mode
-              partying && partySettings ? ( // player is in a party
+            multiplayerAction ? ( // player is on multi player mode
+              partySettings ? ( // player is in a party
                 <Party
                   onGoHome={handleGoHome}
                   partySettings={partySettings}
                   onSetGameSettings={setGameSettings}
-                  onStart={() => setPlaying(true)}
+                  onStart={() => {}}
                   onUpdatePartySettings={setPartySettings}
                 />
               ) : ( // player isn't in a party yet
@@ -91,12 +109,12 @@ function App() {
                   <CreateParty
                     onGoHome={handleGoHome}
                     onSetPartySettings={setPartySettings}
-                    onCreateParty={() => setPartying(true)}
+                    onCreateParty={() => {}}
                   />
                 ) : ( // player clicked join
                   <JoinParty
                     onGoHome={handleGoHome}
-                    onJoinParty={() => setPartying(true)}
+                    onJoinParty={() => {}}
                     onPartySettings={setPartySettings}
                   />
                 )
@@ -105,7 +123,6 @@ function App() {
               <GameSetup
                 onStart={() => setPlaying(true)}
                 onMultiplayerMode={(value: MultiPlayerAction) => {
-                  setMultiplayerMode(true);
                   setMultiplayerAction(value);
                 }}
                 onSetGameSettings={setGameSettings}

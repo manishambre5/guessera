@@ -4,20 +4,22 @@ import { Item, ItemActions, ItemContent, ItemHeader, ItemTitle } from "../ui/ite
 import { Field, FieldLabel, FieldSeparator } from "../ui/field";
 import { Slider } from "../ui/slider";
 import { Button } from "../ui/button";
-import type { GameRoundReport, GameSettings, PlayerGuess, Statement } from "@guessera/types";
+import type { GameRoundReport, GameSettings, PartySettings, PlayerGuess, Statement } from "@guessera/types";
 import Countdown from "./Countdown";
 import formatYear from "@/utils/formatYear";
-import { ChevronLeft, ChevronRight, Image, ImageOff } from "lucide-react";
+import { ChevronLeft, ChevronRight, Image, ImageOff, Smile } from "lucide-react";
 import { Skeleton } from "../ui/skeleton";
 import calculateScore from "@/utils/calculateScore";
 import pickRandomStatements from "@/utils/pickRandomStatements";
+import { socket } from "@/utils/socket";
 
-type PlayRoundProps = {
+type ArenaProps = {
   gameSettings?: GameSettings;
+  partySettings?: PartySettings;
   onRoundEnd?: (report: GameRoundReport) => void;
 };
 
-export default function PlayRound({ onRoundEnd, gameSettings }: PlayRoundProps) {
+export default function Arena({ onRoundEnd, gameSettings, partySettings }: ArenaProps) {
     // STATES
     const [chosenStatements, setChosenStatements] = useState<Statement[]>([]);
     const [currentStatementIndex, setCurrentStatementIndex] = useState<number>(0);
@@ -27,6 +29,7 @@ export default function PlayRound({ onRoundEnd, gameSettings }: PlayRoundProps) 
     const [round, setRound] = useState<number>(0); // to reset round timer
     const [loading, setLoading] = useState<boolean>(true); // to render a skeleton while loading
     const [imgError, setImgError] = useState<boolean>(false); // to render a skeleton if image can't be loaded
+    const [gameOver, setGameOver] = useState<boolean>(false); // flag to track if player finished their round (in multiplayer mode)
 
     // REFs
     const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null); // for smooth hold and press speed increase
@@ -54,8 +57,7 @@ export default function PlayRound({ onRoundEnd, gameSettings }: PlayRoundProps) 
 
         // build guess object for report
         const guessData: PlayerGuess = {
-            statement: chosenStatements[currentStatementIndex].statement,
-            actualYear: Number(chosenStatements[currentStatementIndex].year),
+            statementId: chosenStatements[currentStatementIndex].id,
             guessedYear: sliderValue[0],
             guessScore: calculatedScore,
         };
@@ -67,11 +69,24 @@ export default function PlayRound({ onRoundEnd, gameSettings }: PlayRoundProps) 
             setRound(prev => prev + 1); // increment round to reset timer
             setCurrentStatementIndex((prev) => prev + 1);// go to next statement
         } else {
-            if (onRoundEnd) {
-                onRoundEnd({
-                    finalScore: (score || 0) + calculatedScore,
-                    roundGuessDetails: [...playerGuesses, guessData],
-                }); // end round and send final score and guess details back to parent
+            // Build report payload
+            const finalReport: GameRoundReport = {
+                finalScore: (score || 0) + calculatedScore,
+                roundGuessDetails: [...playerGuesses, guessData],
+            };
+
+            if (gameSettings?.mode === "multi") {
+                setGameOver(true);
+
+                // end round and send final score and guess details back to parent and server
+                if (onRoundEnd) onRoundEnd(finalReport);
+
+                socket.emit("submit_score", {
+                    partyCode: partySettings?.partyCode,
+                    report: finalReport
+                });
+            } else {
+                if (onRoundEnd) onRoundEnd(finalReport);
             }
         }
     };
@@ -145,11 +160,13 @@ export default function PlayRound({ onRoundEnd, gameSettings }: PlayRoundProps) 
             </Item>
 
             {/* Timer */}
-            <Item variant="muted" className="w-fit flex flex-col">
+            <Item variant="muted" className={`w-fit flex flex-col transition-opacity duration-300 ${gameOver ? "opacity-20 pointer-events-none" : ""}`}>
                 <ItemHeader className="">TIME LEFT</ItemHeader>
                 <ItemContent>
                     <ItemTitle className="text-2xl">
-                        <Countdown key={round} limit={20} onComplete={handleSubmitGuess} />
+                        {gameOver ? "00" :
+                            <Countdown key={round} limit={20} onComplete={handleSubmitGuess} />
+                        }
                     </ItemTitle>
                 </ItemContent>
             </Item>
@@ -157,8 +174,17 @@ export default function PlayRound({ onRoundEnd, gameSettings }: PlayRoundProps) 
 
         {/* Statement section */}
         <section className="flex-1 flex flex-col items-center">
-
-            {chosenStatements.length > 0 && currentStatementIndex < chosenStatements.length ? (
+            {gameOver ? (
+                <Card className="aspect-video flex-1 flex flex-col justify-center w-full">
+                    <CardHeader className="flex flex-col items-center">
+                        <Smile />
+                        <CardTitle className="text-xl text-center">
+                            Round Completed. Waiting for the rest to finish the round.
+                        </CardTitle>
+                    </CardHeader>
+                    
+                </Card>
+            ) : chosenStatements.length > 0 && currentStatementIndex < chosenStatements.length ? (
                 <Card className="flex-1 flex flex-col justify-center relative w-full pt-0">
                     {chosenStatements[currentStatementIndex].img?.trim() ? (
                         <div className="flex-1 relative">
@@ -192,13 +218,13 @@ export default function PlayRound({ onRoundEnd, gameSettings }: PlayRoundProps) 
                         <CardTitle className="text-xl text-center">{chosenStatements[currentStatementIndex].statement}</CardTitle>
                     </CardHeader>
                 </Card>
-                ) : (
-                    <Item className="text-destructive bg-destructive/10 flex flex-col w-fit">Nothing left to guess :(</Item>
-                )}
+            ) : (
+                <Item className="text-destructive bg-destructive/10 flex flex-col w-fit">Nothing left to guess :(</Item>
+            )}
         </section>
 
         {/* Guess Form section */}
-        <section className="min-h-1/4 flex items-end">
+        <section className={`min-h-1/4 flex items-end transition-opacity duration-300 ${gameOver ? "opacity-20 pointer-events-none" : ""}`}>
             <Card className="w-full" size="sm">
                 <CardContent>
                 <form
