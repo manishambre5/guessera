@@ -9,12 +9,11 @@ import { useEffect, useState } from "react";
 import { socket } from "@/utils/socket";
 
 type CreatePartyProps = {
-  onCreateParty: () => void;
   onGoHome: () => void;
   onSetPartySettings: (value: PartySettings) => void;
 };
 
-export default function CreateParty({ onCreateParty, onSetPartySettings, onGoHome }: CreatePartyProps) {
+export default function CreateParty({ onSetPartySettings, onGoHome }: CreatePartyProps) {
     // LOCAL STATES
     const [hostName, setHostName] = useState<string>("");
     const [partyName, setPartyName] = useState<string>("");
@@ -33,21 +32,18 @@ export default function CreateParty({ onCreateParty, onSetPartySettings, onGoHom
     };
 
     useEffect(() => {
-        socket.connect();
 
         // Listen for the server successfully creating a party room
         socket.on("party_created", (liveParty: PartySettings) => {
             // Update the parent component's state with the live, synchronized data
             onSetPartySettings?.(liveParty);
-            // Go to party room screen
-            onCreateParty?.();
         });
 
         // Listner clean up code
         return () => {
             socket.off("party_created");
         };
-    }, [onCreateParty, onSetPartySettings]);
+    }, [onSetPartySettings]);
 
   return (
     <Card className="lg:w-1/2 w-full">

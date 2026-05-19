@@ -42,6 +42,8 @@ function App() {
 
 
   useEffect(() => {
+    socket.connect();
+
     // Listen for the host starting a multiplayer game
     socket.on("game_started", (incomingSettings: GameSettings) => {
       console.log("The host has started a game! Syncing settings...");
@@ -57,17 +59,25 @@ function App() {
     });
 
     // Catch the final leaderboard report from the server
-     socket.on("game_over_leaderboard", (finalStandings) => {
-       console.log("Leaderboard standings received:", finalStandings);
-       setPartyRoomLeaderboard(finalStandings);
+    socket.on("game_over_leaderboard", (finalStandings) => {
+      console.log("Leaderboard standings received:", finalStandings);
+      setPartyRoomLeaderboard(finalStandings);
 
-       // exit Arena.tsx and render RoundReport after everyone's done playing
-       setPlaying(false);
-     });
+      // exit Arena.tsx and render RoundReport after everyone's done playing
+      setPlaying(false);
+    });
+
+    // Listen for the player starting a single player game
+    socket.on("single_game_ready", (incomingSettings: GameSettings) => {
+      setGameSettings(incomingSettings);
+      setPlaying(true);
+    });
 
     return (() => {
       socket.off("game_started");
       socket.off("game_over_leaderboard");
+      socket.off("single_game_ready");
+      socket.disconnect();
     });
   }, []);
 
@@ -87,7 +97,7 @@ function App() {
         ) : ( // player is not playing a game
           gameRoundScore ? ( // player has just finished playing a game
             <RoundReport
-              chosenStatements={gameSettings?.statements || []}
+              chosenStatements={gameSettings?.statements}
               report={gameRoundScore}
               leaderboard={partyRoomLeaderboard || []}
               onGoHome={handleGoHome}
@@ -100,8 +110,6 @@ function App() {
                 <Party
                   onGoHome={handleGoHome}
                   partySettings={partySettings}
-                  onSetGameSettings={setGameSettings}
-                  onStart={() => {}}
                   onUpdatePartySettings={setPartySettings}
                 />
               ) : ( // player isn't in a party yet
@@ -109,23 +117,22 @@ function App() {
                   <CreateParty
                     onGoHome={handleGoHome}
                     onSetPartySettings={setPartySettings}
-                    onCreateParty={() => {}}
                   />
                 ) : ( // player clicked join
                   <JoinParty
                     onGoHome={handleGoHome}
-                    onJoinParty={() => {}}
                     onPartySettings={setPartySettings}
                   />
                 )
               )
             ) : ( // player is on singleplayer mode
               <GameSetup
-                onStart={() => setPlaying(true)}
+                onStart={(preferences) => {
+                  socket.emit("request_single_game", { noOfStatements: preferences.noOfStatements });
+                }}
                 onMultiplayerMode={(value: MultiPlayerAction) => {
                   setMultiplayerAction(value);
                 }}
-                onSetGameSettings={setGameSettings}
               />
             )
           )

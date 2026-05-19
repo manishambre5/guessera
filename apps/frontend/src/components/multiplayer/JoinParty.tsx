@@ -9,12 +9,11 @@ import { useEffect, useState } from "react";
 import { socket } from "@/utils/socket";
 
 type JoinPartyProps = {
-  onJoinParty: () => void;
   onGoHome: () => void;
   onPartySettings: (value: PartySettings) => void;
 };
 
-export default function JoinParty({ onGoHome, onJoinParty, onPartySettings }: JoinPartyProps) {
+export default function JoinParty({ onGoHome, onPartySettings }: JoinPartyProps) {
     // LOCAL STATES
     const [playerName, setPlayerName] = useState<string>("");
     const [partyCode, setPartyCode] = useState<string>("");
@@ -38,12 +37,10 @@ export default function JoinParty({ onGoHome, onJoinParty, onPartySettings }: Jo
     };
 
     useEffect(() => {
-        socket.connect();
 
         // When successfully added to the room, the server responds with the updated party object
         socket.on("party_updated", (liveParty: PartySettings) => {
             onPartySettings?.(liveParty);
-            onJoinParty?.(); // Go to the Party room layout
         });
 
         // Listen for validation errors from the server
@@ -56,7 +53,7 @@ export default function JoinParty({ onGoHome, onJoinParty, onPartySettings }: Jo
             socket.off("party_updated");
             socket.off("error_message");
         };
-    }, [onJoinParty, onPartySettings]);
+    }, [onPartySettings]);
 
   return (
     <Card className="lg:w-1/2 w-full">

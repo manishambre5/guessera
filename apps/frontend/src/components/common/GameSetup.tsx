@@ -8,7 +8,7 @@ import { type GamePreferences, type GameMode, type GameSettings, type MultiPlaye
 import Preferences from "./Preferences";
 
 type GameSetupProps = {
-  onStart: () => void;
+  onStart: (preferences: GamePreferences) => void;
   onMultiplayerMode: (value: MultiPlayerAction) => void;
   onSetGameSettings?: (value: GameSettings) => void;
 };
@@ -24,7 +24,7 @@ function GameSetup({ onStart, onMultiplayerMode, onSetGameSettings }: GameSetupP
         if (mode === "multi") {
             if (value === "create") onMultiplayerMode(value);
             else if (value === "join") onMultiplayerMode(value);
-        } else onStart();
+        } else onStart(gamePreferences);
     };
 
   return (

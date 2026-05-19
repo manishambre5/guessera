@@ -10,7 +10,6 @@ import formatYear from "@/utils/formatYear";
 import { ChevronLeft, ChevronRight, Image, ImageOff, Smile } from "lucide-react";
 import { Skeleton } from "../ui/skeleton";
 import calculateScore from "@/utils/calculateScore";
-import pickRandomStatements from "@/utils/pickRandomStatements";
 import { socket } from "@/utils/socket";
 
 type ArenaProps = {
@@ -136,12 +135,8 @@ export default function Arena({ onRoundEnd, gameSettings, partySettings }: Arena
 
 
     useEffect(() => {
-        // TODO: Move this to the server since this is pretty easily hackable
-        if (gameSettings?.mode === "multi" && gameSettings?.statements) {
+        if (gameSettings?.statements && gameSettings.statements.length > 0) {
             setChosenStatements(gameSettings.statements);
-            console.log("using shared set");
-        } else { // pick 'n' random statements if a statements set doesn't exist (i.e. it's a single player game)
-            setChosenStatements(pickRandomStatements(gameSettings?.noOfStatements ?? 5));
         }
     }, []);
 

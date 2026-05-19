@@ -2,24 +2,21 @@ import { Card, CardContent, CardFooter, CardHeader } from "../ui/card";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
 import { Item, ItemContent, ItemHeader } from "../ui/item";
-import type { GamePreferences, GameSettings, PartySettings } from "@guessera/types";
+import type { GamePreferences, PartySettings } from "@guessera/types";
 import Preferences from "../common/Preferences";
 import { useEffect, useState } from "react";
 import { socket } from "@/utils/socket";
 import { Copyable } from "../ui/copyable";
-import pickRandomStatements from "@/utils/pickRandomStatements";
 import Leaderboard from "./Leaderboard";
 import { Badge } from "../ui/badge";
 
 type PartyProps = {
-  onStart: () => void;
   onGoHome: () => void;
   partySettings: PartySettings;
-  onSetGameSettings: (value: GameSettings) => void;
   onUpdatePartySettings: (value: PartySettings) => void;
 };
 
-export default function Party({ onGoHome, partySettings, onSetGameSettings, onUpdatePartySettings, onStart }: PartyProps) {
+export default function Party({ onGoHome, partySettings, onUpdatePartySettings }: PartyProps) {
     // LOCAL STATES
     const [gamePreferences, setGamePreferences] = useState<GamePreferences>({ noOfStatements: 5, difficulty: "easy" });
     const [error, setError] = useState("");
@@ -30,25 +27,13 @@ export default function Party({ onGoHome, partySettings, onSetGameSettings, onUp
         // Only host can start a game (at least for now)
         if (!isHost) return;
 
-        // Generate shared set of statements for a multiplayer game
-        const totalStatements = gamePreferences.noOfStatements ?? 5;
-        const synchedStatements = pickRandomStatements(totalStatements);
-
-        // combining settings and statements together
-        const multiplayerGameSettings: GameSettings = {
-            ...gamePreferences,
-            mode: "multi",
-            statements: synchedStatements
-        };
-
-        onSetGameSettings?.(multiplayerGameSettings);
-
-        socket.emit("start_game",{
+        socket.emit("start_game", {
             partyCode: partySettings.partyCode,
-            settings: (multiplayerGameSettings)
+            settings: {
+                ...gamePreferences,
+                mode: "multi"
+            }
         });
-
-        onStart();
     }
 
 

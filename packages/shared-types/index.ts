@@ -27,7 +27,7 @@ export type GameRoundReport = {
 
 export type GameMode = "single" | "multi";
 export type GameDifficulty = "easy" | "medium" | "hard";
-export type MultiPlayerAction = "create" | "join";
+export type MultiPlayerAction = "create" | "join" | null;
 
 export type GamePreferences = {
   noOfStatements: number;

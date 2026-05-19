@@ -2,7 +2,8 @@ import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
-import type { Player, PartySettings as Party } from "@guessera/types";
+import type { Player, PartySettings as Party, Statement } from "@guessera/types";
+import { statements } from './data/statements.js';
 
 const app = express();
 app.use(cors());
@@ -22,6 +23,20 @@ const parties: Record<string, Party> = {};
 const generateRoomCode = (): string => {
   return Math.random().toString(36).substring(2, 6).toUpperCase();
 };
+
+// Helper to pick a set of statements
+const pickRandomStatements = (n: number): Statement[] => {
+  const chosenStatements = [];
+  const usedIndices = new Set();
+  while (chosenStatements.length < n) {
+    const randomIndex = Math.floor(Math.random() * statements.length);
+    if (!usedIndices.has(randomIndex)) {
+      usedIndices.add(randomIndex);
+      chosenStatements.push(statements[randomIndex]);
+    }
+  }
+  return chosenStatements;
+}
 
 // CENTRALIZED EXIT HANDLER (for both Disconnects and Manual exits)
 const handlePlayerLeave = (socketId: string, io: any) => {
@@ -133,10 +148,17 @@ io.on("connection", (socket) => {
         player.score = 0; // Reset any old scores
       });
 
+      // to push settings to client
+      const serverPickedStatements = pickRandomStatements(settings.noOfStatements ?? 5);
+      const finalSettings = {
+        ...settings,
+        statements: serverPickedStatements
+      };
+
       console.log(`Starting a multiplayer game for room: ${code}`);
 
       // Tell everyone in the room
-      io.to(code).emit("game_started", settings);
+      io.to(code).emit("game_started", finalSettings);
     }
   })
 
@@ -168,6 +190,19 @@ io.on("connection", (socket) => {
       io.to(code).emit("game_over_leaderboard", finalLeaderboard);
     }
   })
+
+  // SINGLE PLAYER GAME
+  socket.on("request_single_game", ({ noOfStatements = 5 }) => {
+    const pickedStatements = pickRandomStatements(noOfStatements);
+
+    const singlePlayerSettings = {
+        mode: "single",
+        noOfStatements,
+        statements: pickedStatements
+    };
+
+    socket.emit("single_game_ready", singlePlayerSettings);
+  });
 
   // MANUAL EXIT PARTY ROOM
   socket.on("leave_party", () => {

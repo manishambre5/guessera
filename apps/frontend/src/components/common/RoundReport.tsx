@@ -123,10 +123,8 @@ const RoundReport: React.FC<GameRoundReportProps> = ({ chosenStatements, report,
                   ))
                 ) : (
                   <>
-                    <TableCell className="text-center text-muted-foreground text-xs italic">
-                      Final Tally
-                    </TableCell>
-                    <TableCell className="text-center bg-accent text-accent-foreground font-extrabold">
+                    <TableCell></TableCell>
+                    <TableCell className="text-center bg-accent font-bold">
                       {report.finalScore}
                     </TableCell>
                   </>
