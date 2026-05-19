@@ -34,6 +34,10 @@ function App() {
     setPartySettings(undefined);
   };
 
+  const handleGoBackToRoom = () => {
+    setGameRoundScore(null);
+  };
+
 
   useEffect(() => {
     // Listen for the host starting a multiplayer game
@@ -53,12 +57,12 @@ function App() {
   }, []);
 
   return (
-    <div className="relative h-screen overflow-hidden">
-      <div className="absolute inset-0 bg-cover bg-center blur-pxs bg-[url('https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Ashurbanipal_in_a_chariot%2C_wall_relief%2C_7th_century_BC%2C_from_Nineveh%2C_the_British_Museum.jpg/3840px-Ashurbanipal_in_a_chariot%2C_wall_relief%2C_7th_century_BC%2C_from_Nineveh%2C_the_British_Museum.jpg')]" />
+    <div className="relative h-full">
+      <div className="fixed inset-0 bg-cover bg-center blur-pxs bg-[url('https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Ashurbanipal_in_a_chariot%2C_wall_relief%2C_7th_century_BC%2C_from_Nineveh%2C_the_British_Museum.jpg/3840px-Ashurbanipal_in_a_chariot%2C_wall_relief%2C_7th_century_BC%2C_from_Nineveh%2C_the_British_Museum.jpg')]" />
 
-      <div className="absolute inset-0 bg-black/50" />
+      <div className="fixed inset-0 bg-black/50" />
 
-      <div className='flex flex-col gap-2 h-screen w-screen items-center justify-center p-2 relative z-10'>
+      <div className='flex flex-col gap-2 min-h-screen h-full w-screen items-center justify-center p-2 relative z-10'>
         {playing && gameSettings ? ( // player is playing a game
           <PlayRound
             onRoundEnd={handleGameRoundEnd}
@@ -69,6 +73,8 @@ function App() {
             <RoundReport
               report={gameRoundScore}
               onGoHome={handleGoHome}
+              onGoBackToRoom={handleGoBackToRoom}
+              mode={gameSettings?.mode}
             />
           ) : ( // player hasn't played yet
             multiplayerMode ? ( // player is on multi player mode

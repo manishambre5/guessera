@@ -1,14 +1,16 @@
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
 import { Item, ItemContent, ItemHeader } from "../ui/item";
 import type { GamePreferences, GameSettings, PartySettings } from "@guessera/types";
 import Preferences from "../common/Preferences";
 import { useEffect, useState } from "react";
-import { Star } from "lucide-react";
 import { socket } from "@/utils/socket";
 import { Copyable } from "../ui/copyable";
 import pickRandomStatements from "@/utils/pickRandomStatements";
+import Leaderboard from "./Leaderboard";
+import PartyHistory from "./PartyHistory";
+import { Badge } from "../ui/badge";
 
 type PartyProps = {
   onStart: () => void;
@@ -71,45 +73,44 @@ export default function Party({ onGoHome, partySettings, onSetGameSettings, onUp
 
   return (
     <Card className="lg:w-1/2 w-full">
-        <CardHeader className="text-center">
+        <CardHeader className="flex items-center justify-between">
             <CardTitle className="text-2xl">{partySettings.partyName || "unnamed"} Party</CardTitle>
-            <CardDescription>
-                {isHost 
-                    ? "Configure settings and start the match whenever your party is ready!" 
-                    : "Waiting in Party Room. The host will start a game once everyone's here."
-                }
-            </CardDescription>
+
+            <Item variant="muted" size="xs" className="w-fit flex flex-col">
+                <ItemContent className="flex flex-row items-center">
+                    <p className="text-muted-foreground px-2">Party Code:</p>
+                    <Copyable target={partySettings.partyCode} />
+                </ItemContent>
+            </Item>
         </CardHeader>
 
         <Separator />
 
         <CardContent className="flex flex-col gap-2">
 
-            <Item variant="muted" className="flex flex-col">
-                <ItemContent className="flex flex-row items-center gap-2">
-                    <p className="text-muted-foreground">Party Code:</p>
-                    <Copyable target={partySettings.partyCode} />
-                </ItemContent>
-            </Item>
-
-            <Item variant="outline">
+            <Item variant="outline" className="bg-background">
                 <ItemHeader>Party Room ({partySettings.players.length || 0} players)</ItemHeader>
                 <ItemContent>
                     <div className="flex gap-2 items-center flex-wrap">
                         {partySettings.players.map((player) => (
-                            <Item key={player.id} variant="outline" className="w-fit gap-1">
+                            <Item key={player.id} variant="outline" size="xs" className="w-fit flex items-center">
+                                <span className="text-xl">{player.name}</span>
                                 {player.isHost &&
-                                    <Star className="size-4 fill-chart-2 text-chart-2" />
+                                    <Badge variant="secondary" className="text-muted-foreground uppercase">host</Badge>
                                 }
-                                <span>{player.name}</span>
                                 {player.id === socket.id &&
-                                    <span className="text-muted-foreground">(You)</span>
+                                    <Badge variant="secondary" className="text-muted-foreground uppercase">you</Badge>
                                 }
                             </Item>
                         ))}
                     </div>
                 </ItemContent>
             </Item>
+
+            <div className="flex gap-2">
+                <Leaderboard players={partySettings.players} />
+                <PartyHistory />
+            </div>
 
             {isHost && (
                 <Preferences onSetGamePreferences={setGamePreferences} />

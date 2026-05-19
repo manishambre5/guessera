@@ -1,4 +1,4 @@
-import type { GameRoundReport, PlayerGuess } from "@guessera/types";
+import type { GameMode, GameRoundReport, PlayerGuess } from "@guessera/types";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "../ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
@@ -9,9 +9,11 @@ import { ScrollArea } from "../ui/scroll-area";
 type GameRoundReportProps = {
   report: GameRoundReport;
   onGoHome: () => void;
+  onGoBackToRoom: () => void;
+  mode?: GameMode;
 };
 
-const RoundReport: React.FC<GameRoundReportProps> = ({ report, onGoHome }) => {
+const RoundReport: React.FC<GameRoundReportProps> = ({ report, onGoHome, onGoBackToRoom, mode }) => {
   return (
     <Card className="lg:w-1/2 w-full max-h-screen flex flex-col">
       <CardHeader className="text-center">
@@ -48,9 +50,15 @@ const RoundReport: React.FC<GameRoundReportProps> = ({ report, onGoHome }) => {
       </CardContent>
       <CardFooter>
         <div className="flex items-center justify-center gap-4 w-full">
-          <Button size="lg" onClick={onGoHome}>
+          {mode === "multi" ? (
+            <Button size="lg" onClick={onGoBackToRoom}>
+              Back to Room
+            </Button>
+          ) : (
+            <Button size="lg" onClick={onGoHome}>
               Home
-          </Button>
+            </Button>
+          )}
         </div>
       </CardFooter>
     </Card>
