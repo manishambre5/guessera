@@ -92,7 +92,8 @@ io.on("connection", (socket) => {
       partyName,
       hostName,
       players: [hostPlayer],
-      gameStarted: false
+      gameStarted: false,
+      roundHistory: []
     };
 
     parties[partyCode] = newParty;
@@ -145,7 +146,6 @@ io.on("connection", (socket) => {
       // Flag all player in the room into active gameplay state
       party.players.forEach((player) => {
         player.isPlaying = true;
-        player.score = 0; // Reset any old scores
       });
 
       // to push settings to client
@@ -163,7 +163,7 @@ io.on("connection", (socket) => {
   })
 
   // SCORE SUBMISSION
-  socket.on("submit_score", ({ partyCode, report }) => {
+  socket.on("submit_score", async ({ partyCode, report }) => {
     const code = partyCode.toUpperCase();
     const party = parties[code];
 
@@ -172,22 +172,44 @@ io.on("connection", (socket) => {
     // find the player who just submitted their score
     const player = party.players.find(p => p.id === socket.id);
     if (player) {
-      player.score = report.finalScore;
+      player.score += report.finalScore;
       player.guesses = report.roundGuessDetails;
       player.isPlaying = false;
       console.log(`Player ${player.name} from party room ${code} has finished and submitted report.`);
+      console.log(`Player ${player.name} score is now: ${player.score}`);
+      console.log(`Report received from ${socket.id}:`, report.finalScore);
     }
 
     // check if everyone else has finished their round
     const allFinished = party.players.every(p => !p.isPlaying);
 
     if (allFinished) {
+      const socketsInRoom = await io.in(code).fetchSockets();
+      console.log(`Sockets in room ${code}:`, socketsInRoom.map(s => s.id));
+
+
       console.log(`All players in party room ${code} have finished the round. Generating final leaderboard report...`);
 
       const finalLeaderboard = [...party.players].sort((a, b) => b.score - a.score);
 
+      party.roundHistory.push({
+        roundNumber: party.roundHistory.length + 1,
+        standings: finalLeaderboard.map(p => ({
+          name: p.name,
+          roundScore: p.guesses.reduce((sum, g) => sum + g.guessScore, 0),
+          totalScore: p.score
+        }))
+      });
+
+      party.gameStarted = false;
       // broadcast the final leaderboard standings to the entire room simultaneously
-      io.to(code).emit("game_over_leaderboard", finalLeaderboard);
+      io.to(code).emit("game_over_leaderboard", {
+        standings: finalLeaderboard,
+        history: party.roundHistory
+      });
+
+      io.to(code).emit("party_updated", party); // sync updated scores to everyone
+      console.log("party_updated emitted to room:", code);
     }
   })
 

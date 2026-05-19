@@ -38,11 +38,6 @@ export default function JoinParty({ onGoHome, onPartySettings }: JoinPartyProps)
 
     useEffect(() => {
 
-        // When successfully added to the room, the server responds with the updated party object
-        socket.on("party_updated", (liveParty: PartySettings) => {
-            onPartySettings?.(liveParty);
-        });
-
         // Listen for validation errors from the server
         socket.on("error_message", (msg: string) => {
             setError(msg);
@@ -50,7 +45,6 @@ export default function JoinParty({ onGoHome, onPartySettings }: JoinPartyProps)
 
         // Listner clean up code
         return () => {
-            socket.off("party_updated");
             socket.off("error_message");
         };
     }, [onPartySettings]);

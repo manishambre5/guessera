@@ -2,7 +2,7 @@ import { Card, CardContent, CardFooter, CardHeader } from "../ui/card";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
 import { Item, ItemContent, ItemHeader } from "../ui/item";
-import type { GamePreferences, PartySettings } from "@guessera/types";
+import type { GamePreferences, PartySettings, RoundStats } from "@guessera/types";
 import Preferences from "../common/Preferences";
 import { useEffect, useState } from "react";
 import { socket } from "@/utils/socket";
@@ -13,10 +13,10 @@ import { Badge } from "../ui/badge";
 type PartyProps = {
   onGoHome: () => void;
   partySettings: PartySettings;
-  onUpdatePartySettings: (value: PartySettings) => void;
+  roundHistory: RoundStats[];
 };
 
-export default function Party({ onGoHome, partySettings, onUpdatePartySettings }: PartyProps) {
+export default function Party({ onGoHome, partySettings, roundHistory }: PartyProps) {
     // LOCAL STATES
     const [gamePreferences, setGamePreferences] = useState<GamePreferences>({ noOfStatements: 5, difficulty: "easy" });
     const [error, setError] = useState("");
@@ -38,21 +38,15 @@ export default function Party({ onGoHome, partySettings, onUpdatePartySettings }
 
 
     useEffect(() => {
-        // Listen for player array changes (joins, leaves, host switches)
-        socket.on("party_updated", (updatedParty: PartySettings) => {
-            onUpdatePartySettings?.(updatedParty);
-        });
-
         socket.on("error_message", (msg: string) => {
             setError(msg);
         });
 
         // Listner clean up code
         return () => {
-            socket.off("party_updated");
             socket.off("error_message");
         };
-    }, [onUpdatePartySettings]);
+    }, []);
 
 
   return (
@@ -93,7 +87,7 @@ export default function Party({ onGoHome, partySettings, onUpdatePartySettings }
 
 
             <div className="flex gap-2">
-                <Leaderboard players={partySettings.players} />
+                <Leaderboard players={partySettings.players} roundHistory={roundHistory} />
                 {/*<PartyHistory />*/}
             </div>
 

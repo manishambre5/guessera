@@ -44,4 +44,14 @@ export type PartySettings = {
   partyCode: string;
   players: Player[];
   gameStarted: boolean;
+  roundHistory: RoundStats[];
+};
+
+export type RoundStats = {
+  roundNumber: number;
+  standings: {
+    name: string;
+    roundScore: number;
+    totalScore: number;
+  }[];
 };

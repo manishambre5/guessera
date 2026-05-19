@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import GameSetup from './components/common/GameSetup';
 import Arena from './components/common/Arena';
-import type { GameRoundReport, GameSettings, MultiPlayerAction, PartySettings } from '@guessera/types';
+import type { GameRoundReport, GameSettings, MultiPlayerAction, PartySettings, RoundStats } from '@guessera/types';
 import RoundReport from './components/common/RoundReport';
 import CreateParty from './components/multiplayer/CreateParty';
 import JoinParty from './components/multiplayer/JoinParty';
@@ -17,6 +17,7 @@ function App() {
   const [gameSettings, setGameSettings] = useState<GameSettings>();
   const [partySettings, setPartySettings] = useState<PartySettings>();
   const [partyRoomLeaderboard, setPartyRoomLeaderboard] = useState<any[] | null>(null);
+  const [roundHistory, setRoundHistory] = useState<RoundStats[]>([]);
 
 
   // HANDLERS
@@ -43,6 +44,12 @@ function App() {
 
   useEffect(() => {
     socket.connect();
+    
+    // remove before adding to prevent duplicates
+    socket.off("game_started");
+    socket.off("game_over_leaderboard");
+    socket.off("single_game_ready");
+    socket.off("party_updated");
 
     // Listen for the host starting a multiplayer game
     socket.on("game_started", (incomingSettings: GameSettings) => {
@@ -61,7 +68,8 @@ function App() {
     // Catch the final leaderboard report from the server
     socket.on("game_over_leaderboard", (finalStandings) => {
       console.log("Leaderboard standings received:", finalStandings);
-      setPartyRoomLeaderboard(finalStandings);
+      setPartyRoomLeaderboard(finalStandings.standings);
+      setRoundHistory(finalStandings.history);
 
       // exit Arena.tsx and render RoundReport after everyone's done playing
       setPlaying(false);
@@ -73,10 +81,17 @@ function App() {
       setPlaying(true);
     });
 
+    // Listen for player array changes (joins, leaves, host switches)
+    socket.on("party_updated", (updatedParty: PartySettings) => {
+      console.log("party_updated received, players:", updatedParty.players.map(p => `${p.name}: ${p.score}`));
+      setPartySettings(updatedParty);
+    });
+
     return (() => {
       socket.off("game_started");
       socket.off("game_over_leaderboard");
       socket.off("single_game_ready");
+      socket.off("party_updated");
       socket.disconnect();
     });
   }, []);
@@ -110,7 +125,7 @@ function App() {
                 <Party
                   onGoHome={handleGoHome}
                   partySettings={partySettings}
-                  onUpdatePartySettings={setPartySettings}
+                  roundHistory={roundHistory}
                 />
               ) : ( // player isn't in a party yet
                 multiplayerAction === "create" ? ( // player clicked create
