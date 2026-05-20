@@ -13,9 +13,9 @@ type LeaderboardProps = {
 export default function Leaderboard({ players, roundHistory }: LeaderboardProps) {
 
     return (
-        <div className="flex flex-row-reverse gap-4 w-full">
+        <div className="flex flex-col md:items-start md:flex-row-reverse gap-4 w-full">
         {roundHistory.length > 0 && (
-        <Card className="rounded-lg">
+        <Card className="rounded-lg min-w-1/3">
             <CardHeader className="text-center">
                 <CardTitle>Leaderboard</CardTitle>
             </CardHeader>
@@ -66,7 +66,7 @@ export default function Leaderboard({ players, roundHistory }: LeaderboardProps)
             <Separator />
 
             <CardContent className="flex-1 min-h-0 w-full overflow-hidden flex flex-col gap-4">
-                <ScrollArea className="h-64 w-full">
+                <ScrollArea className="h-48 w-full">
                 {roundHistory.map((round) => (
                     <div key={round.roundNumber}>
                         <p className="text-muted-foreground uppercase mt-2">Round {round.roundNumber}</p>

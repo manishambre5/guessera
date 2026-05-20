@@ -7,7 +7,7 @@ import { Button } from "../ui/button";
 import type { GameRoundReport, GameSettings, PartySettings, PlayerGuess, Statement } from "@guessera/types";
 import Countdown from "./Countdown";
 import formatYear from "@/utils/formatYear";
-import { ChevronLeft, ChevronRight, Image, ImageOff, Smile } from "lucide-react";
+import { ChevronsLeft, ChevronsRight, Image, ImageOff, Smile } from "lucide-react";
 import { Skeleton } from "../ui/skeleton";
 import calculateScore from "@/utils/calculateScore";
 import { socket } from "@/utils/socket";
@@ -142,12 +142,12 @@ export default function Arena({ onRoundEnd, gameSettings, partySettings }: Arena
 
 
   return (
-    <div className='flex flex-col justify-between gap-2 size-full lg:w-1/2 bg-background p-2 rounded-xl'>
+    <div className='flex flex-col gap-2 size-full justify-between lg:w-5/6 bg-background p-2 rounded-2xl'>
 
         {/* Score and Timer */}
         <header className="h-fit flex flex-row-reverse gap-2 justify-between items-start">
             {/* Score */}
-            <Item variant="muted" className="max-w-1/3 flex flex-col">
+            <Item variant="muted" className="w-fit flex flex-col">
                 <ItemHeader className="">SCORE</ItemHeader>
                 <ItemContent>
                     <ItemTitle className="text-2xl">{score}</ItemTitle>
@@ -168,9 +168,9 @@ export default function Arena({ onRoundEnd, gameSettings, partySettings }: Arena
         </header>
 
         {/* Statement section */}
-        <section className="flex-1 flex flex-col items-center">
+        <section className="flex-1 md:min-h-96 flex flex-col items-center">
             {gameOver ? (
-                <Card className="aspect-video flex-1 flex flex-col justify-center w-full">
+                <Card className="flex-1 flex flex-col justify-center aspect-video md:aspect-auto w-full">
                     <CardHeader className="flex flex-col items-center">
                         <Smile />
                         <CardTitle className="text-xl text-center">
@@ -180,16 +180,16 @@ export default function Arena({ onRoundEnd, gameSettings, partySettings }: Arena
                     
                 </Card>
             ) : chosenStatements.length > 0 && currentStatementIndex < chosenStatements.length ? (
-                <Card className="flex-1 flex flex-col justify-center relative w-full pt-0">
+                <Card className="flex-1 flex flex-col md:flex-row md:items-center relative size-full pt-0 md:py-0">
                     {chosenStatements[currentStatementIndex].img?.trim() ? (
-                        <div className="flex-1 relative">
+                        <div className="flex-1 self-stretch md:aspect-auto aspect-video relative">
                             {loading && (
-                                <Skeleton className="m-2 h-full flex items-center justify-center">
+                                <Skeleton className="m-2 flex-1 flex items-center justify-center">
                                     <Image className="text-chart-1 size-16" />
                                 </Skeleton>
                             )}
                             {imgError ? (
-                                <Skeleton className="m-2 h-full flex items-center justify-center animate-none">
+                                <Skeleton className="m-2 flex-1 flex items-center justify-center animate-none">
                                     <ImageOff className="text-chart-1 size-16" />
                                 </Skeleton>
                             ) : (
@@ -205,12 +205,12 @@ export default function Arena({ onRoundEnd, gameSettings, partySettings }: Arena
                             )}
                         </div>
                     ) : (
-                        <Skeleton className="m-2 h-full flex items-center justify-center">
+                        <Skeleton className="m-2 flex-1 flex items-center justify-center">
                             <ImageOff className="text-chart-1 size-16" />
                         </Skeleton>
                     )}
-                    <CardHeader className="h-fit">
-                        <CardTitle className="text-xl text-center">{chosenStatements[currentStatementIndex].statement}</CardTitle>
+                    <CardHeader className="md:h-fit h-fit md:flex-1 text-center">
+                        <CardTitle className="md:text-xl lg:text-2xl">{chosenStatements[currentStatementIndex].statement}</CardTitle>
                     </CardHeader>
                 </Card>
             ) : (
@@ -219,7 +219,7 @@ export default function Arena({ onRoundEnd, gameSettings, partySettings }: Arena
         </section>
 
         {/* Guess Form section */}
-        <section className={`min-h-1/4 flex items-end transition-opacity duration-300 ${gameOver ? "opacity-20 pointer-events-none" : ""}`}>
+        <section className={`h-fit flex items-end transition-opacity duration-300 ${gameOver ? "opacity-20 pointer-events-none" : ""}`}>
             <Card className="w-full" size="sm">
                 <CardContent>
                 <form
@@ -227,25 +227,26 @@ export default function Arena({ onRoundEnd, gameSettings, partySettings }: Arena
                     onSubmit={handleSubmitGuess}
                 >
                     {/* Guess Controls */}
-                    <div className="items-start h-14 flex gap-1">
+                    <div className="items-start flex gap-1">
                         <Button
                             type="button"
-                            variant="outline"
-                            size="icon"
+                            variant="secondary"
+                            size="icon-lg"
                             onPointerDown={handlePointerDown(false)}
                             onPointerUp={handlePointerUp}
                             onPointerLeave={handlePointerUp}
                             onPointerCancel={handlePointerUp}
                         >
-                            <ChevronLeft />
+                            <ChevronsLeft />
                         </Button>
-                        <Field className='w-full self-end'>
+                        <Field className='w-full'>
                             <Slider
                                 min={oldestYear}
                                 max={currentYear}
                                 step={1}
                                 value={sliderValue}
                                 onValueChange={setSliderValue}
+                                className="py-4 bg-muted rounded-md"
                             />
                             <FieldLabel className='text-muted-foreground uppercase w-full flex justify-between'>
                                 {yearLabels.map((year, i) => (
@@ -264,14 +265,14 @@ export default function Arena({ onRoundEnd, gameSettings, partySettings }: Arena
                         </Field>
                         <Button
                             type="button"
-                            variant="outline"
-                            size="icon"
+                            variant="secondary"
+                            size="icon-lg"
                             onPointerDown={handlePointerDown(true)}
                             onPointerUp={handlePointerUp}
                             onPointerLeave={handlePointerUp}
                             onPointerCancel={handlePointerUp}
                         >
-                            <ChevronRight />
+                            <ChevronsRight />
                         </Button>
                     </div>
 

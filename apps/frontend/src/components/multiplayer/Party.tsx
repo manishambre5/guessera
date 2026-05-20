@@ -50,13 +50,13 @@ export default function Party({ onGoHome, partySettings, roundHistory }: PartyPr
 
 
   return (
-    <Card className="lg:w-1/2 w-full">
+    <Card className="lg:w-2/3 w-full">
         <CardHeader className="flex justify-between">
             <Item variant="outline" className="flex-1">
                 <ItemHeader>
                     <p className="text-2xl">{partySettings.partyName}</p>
-                    <Item size="xs" className="w-fit flex flex-col">
-                        <ItemContent className="flex flex-row items-center">
+                    <Item size="xs" className="w-fit flex flex-col" variant="outline">
+                        <ItemContent className="flex items-center">
                             <p className="text-muted-foreground px-2">Party Code</p>
                             <Copyable target={partySettings.partyCode} />
                         </ItemContent>
@@ -68,10 +68,10 @@ export default function Party({ onGoHome, partySettings, roundHistory }: PartyPr
                             <Item key={player.id} variant="outline" size="xs" className="w-fit flex items-center">
                                 <span className="text-lg">{player.name}</span>
                                 {player.isHost &&
-                                    <Badge variant="secondary" className="text-background uppercase bg-blue-300">host</Badge>
+                                    <Badge variant="secondary" className="text-background uppercase bg-red-400">host</Badge>
                                 }
                                 {player.id === socket.id &&
-                                    <Badge variant="secondary" className="text-background uppercase bg-emerald-300">you</Badge>
+                                    <Badge variant="secondary" className="text-background uppercase bg-blue-400">you</Badge>
                                 }
                             </Item>
                         ))}

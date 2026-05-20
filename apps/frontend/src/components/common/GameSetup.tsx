@@ -60,7 +60,7 @@ function GameSetup({ onStart, onMultiplayerMode, onSetGameSettings }: GameSetupP
                                 defaultChecked
                             >
                                 <span className="text-2xl leading-none font-light">Single Player</span>
-                                <span className="text-xs text-muted-foreground">Get some practice alone.</span>
+                                <span className="text-xs text-muted-foreground">Get some practice.</span>
                             </ToggleGroupItem>
                             <ToggleGroupItem
                                 value="multi"
@@ -68,7 +68,7 @@ function GameSetup({ onStart, onMultiplayerMode, onSetGameSettings }: GameSetupP
                                 className="flex flex-col items-center justify-center w-1/2 min-h-24"
                             >
                                 <span className="text-2xl leading-none font-light">Multi-Player</span>
-                                <span className="text-xs text-muted-foreground text-wrap">Play with friends. (Coming soon)</span>
+                                <span className="text-xs text-muted-foreground text-wrap">Play with friends!</span>
                             </ToggleGroupItem>
                         </ToggleGroup>
                     </FieldSet>

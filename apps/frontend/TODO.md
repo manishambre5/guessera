@@ -1,3 +1,5 @@
+- Move scoring logic to server.
+
 - In-Game Score Syncing: Emit an event whenever a user answers a question correctly to update their score on the server, for a live leaderboard mid-game. It will show up in the score section of PlayRound component and will show all the players, their scores and the #statemtent they are at.
 
 - Handle Mid-Game Disconnects: If a user drops while a match is live, cleanly remove them from the active players roster without crashing the game state for everyone else. Right now the player who quit still stays in the room.

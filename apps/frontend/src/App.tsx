@@ -105,7 +105,7 @@ function App() {
 
       <div className="fixed inset-0 bg-black/50" />
 
-      <div className='flex flex-col gap-2 min-h-screen h-full w-screen items-center justify-center p-2 relative z-10'>
+      <div className='flex flex-col gap-2 min-h-screen size-full items-center justify-center p-2 relative z-10'>
         {playing && gameSettings ? ( // player is playing a game
           <Arena
             onRoundEnd={handleGameRoundEnd}

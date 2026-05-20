@@ -19,7 +19,7 @@ type GameRoundReportProps = {
 
 const RoundReport: React.FC<GameRoundReportProps> = ({ chosenStatements, report, onGoHome, onGoBackToRoom, mode, leaderboard }) => {
   return (
-    <Card className="lg:w-1/2 w-full max-h-screen flex flex-col">
+    <Card className="lg:w-2/3 w-full max-h-screen flex flex-col">
       <CardHeader className="text-center">
         <CardTitle className="text-xl">
             Your final score: {report.finalScore}
@@ -68,7 +68,7 @@ const RoundReport: React.FC<GameRoundReportProps> = ({ chosenStatements, report,
                       #{index + 1}
                     </TableCell>
                     
-                    <TableCell className="whitespace-normal md:text-sm text-xs max-w-xs">
+                    <TableCell className="whitespace-normal md:text-sm text-xs max-w-64">
                       {matchedStatement?.statement}
                     </TableCell>
                     
@@ -134,7 +134,8 @@ const RoundReport: React.FC<GameRoundReportProps> = ({ chosenStatements, report,
             
           </Table>
 
-          <ScrollBar />
+          <ScrollBar orientation="horizontal" />
+          <ScrollBar orientation="vertical" />
         </ScrollArea>
       </CardContent>
 
