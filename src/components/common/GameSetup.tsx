@@ -6,6 +6,8 @@ import { Separator } from "../ui/separator";
 import { useState } from "react";
 import { type GamePreferences, type GameMode, type GameSettings, type MultiPlayerAction } from "@/types";
 import Preferences from "./Preferences";
+import { Item, ItemContent } from "../ui/item";
+import { ExternalLink } from "lucide-react";
 
 type GameSetupProps = {
   onStart: () => void;
@@ -59,7 +61,7 @@ function GameSetup({ onStart, onMultiplayerMode, onSetGameSettings }: GameSetupP
                                 defaultChecked
                             >
                                 <span className="text-2xl leading-none font-light">Single Player</span>
-                                <span className="text-xs text-muted-foreground">Get some practice alone.</span>
+                                <span className="text-xs text-muted-foreground">Get some practice.</span>
                             </ToggleGroupItem>
                             <ToggleGroupItem
                                 value="multi"
@@ -67,13 +69,28 @@ function GameSetup({ onStart, onMultiplayerMode, onSetGameSettings }: GameSetupP
                                 className="flex flex-col items-center justify-center w-1/2 min-h-24"
                             >
                                 <span className="text-2xl leading-none font-light">Multi-Player</span>
-                                <span className="text-xs text-muted-foreground text-wrap">Play with friends. (Coming soon)</span>
+                                <span className="text-xs text-muted-foreground text-wrap">Play with friends!</span>
                             </ToggleGroupItem>
                         </ToggleGroup>
                     </FieldSet>
 
-                    {mode === "single" &&
+                    {mode === "single" ?
                         <Preferences onSetGamePreferences={setGamePreferences} />
+
+                        : 
+                        <Item className="flex flex-col">
+                            <p>Not available online yet.</p>
+                            <ItemContent className="flex flex-row items-center">
+                                <p>Please check</p>
+                                <Button variant="ghost" asChild>
+                                    <a href="https://github.com/manishambre5/guessera">
+                                        Github Repo
+                                        <ExternalLink />
+                                    </a>
+                                </Button>
+                                <p>for a preview.</p>
+                            </ItemContent>
+                        </Item>
                     }
 
                 </FieldGroup>
