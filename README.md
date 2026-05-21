@@ -2,12 +2,10 @@
 
 ---
 
-# Multiplayer Version being built with Express, Node.js and Socket.IO
+# [Check it out live](https://play-guessera.vercel.app/)
 
 ---
 
 ### TODO
-- Create party room on server
-- Join a party room
-- Play a game together
-- Render Game Report in Party Room
+- Live leaderboard during gameplay
+- Improve transition screens
