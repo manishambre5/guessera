@@ -7,8 +7,7 @@ import { Button } from "../ui/button";
 import type { GameRoundReport, GameSettings, PartySettings, PlayerGuess, Statement } from "@guessera/types";
 import Countdown from "./Countdown";
 import formatYear from "@/utils/formatYear";
-import { ChevronsLeft, ChevronsRight, Image, ImageOff, Smile } from "lucide-react";
-import { Skeleton } from "../ui/skeleton";
+import { ChevronsLeft, ChevronsRight, Smile } from "lucide-react";
 import calculateScore from "@/utils/calculateScore";
 import { socket } from "@/utils/socket";
 
@@ -26,8 +25,6 @@ export default function Arena({ onRoundEnd, gameSettings, partySettings }: Arena
     const [playerGuesses, setPlayerGuesses] = useState<PlayerGuess[]>([]);
     const [score, setScore] = useState<number>(0);
     const [round, setRound] = useState<number>(0); // to reset round timer
-    const [loading, setLoading] = useState<boolean>(true); // to render a skeleton while loading
-    const [imgError, setImgError] = useState<boolean>(false); // to render a skeleton if image can't be loaded
     const [gameOver, setGameOver] = useState<boolean>(false); // flag to track if player finished their round (in multiplayer mode)
 
     // REFs
@@ -181,34 +178,6 @@ export default function Arena({ onRoundEnd, gameSettings, partySettings }: Arena
                 </Card>
             ) : chosenStatements.length > 0 && currentStatementIndex < chosenStatements.length ? (
                 <Card className="flex-1 flex flex-col md:flex-row md:items-center relative size-full pt-0 md:py-0">
-                    {chosenStatements[currentStatementIndex].img?.trim() ? (
-                        <div className="flex-1 self-stretch md:aspect-auto aspect-video relative">
-                            {loading && (
-                                <Skeleton className="m-2 flex-1 flex items-center justify-center">
-                                    <Image className="text-chart-1 size-16" />
-                                </Skeleton>
-                            )}
-                            {imgError ? (
-                                <Skeleton className="m-2 flex-1 flex items-center justify-center animate-none">
-                                    <ImageOff className="text-chart-1 size-16" />
-                                </Skeleton>
-                            ) : (
-                                <img
-                                    src={chosenStatements[currentStatementIndex].img}
-                                    className={`absolute inset-0 size-full object-cover brightness-60 dark:brightness-40`}
-                                    onLoad={() => setLoading(false)}
-                                    onError={() => {
-                                        setImgError(true);
-                                        setLoading(false);
-                                    }}
-                                />
-                            )}
-                        </div>
-                    ) : (
-                        <Skeleton className="m-2 flex-1 flex items-center justify-center">
-                            <ImageOff className="text-chart-1 size-16" />
-                        </Skeleton>
-                    )}
                     <CardHeader className="md:h-fit h-fit md:flex-1 text-center">
                         <CardTitle className="md:text-xl lg:text-2xl">{chosenStatements[currentStatementIndex].statement}</CardTitle>
                     </CardHeader>

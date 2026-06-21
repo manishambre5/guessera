@@ -101,7 +101,7 @@ function App() {
 
   return (
     <div className="relative h-full">
-      <div className="fixed inset-0 bg-cover bg-center blur-pxs bg-[url('https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Ashurbanipal_in_a_chariot%2C_wall_relief%2C_7th_century_BC%2C_from_Nineveh%2C_the_British_Museum.jpg/3840px-Ashurbanipal_in_a_chariot%2C_wall_relief%2C_7th_century_BC%2C_from_Nineveh%2C_the_British_Museum.jpg')]" />
+      <div className="fixed inset-0 bg-cover bg-center blur-pxs" />
 
       <div className="fixed inset-0 bg-black/50" />
 
