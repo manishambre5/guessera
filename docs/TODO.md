@@ -3,6 +3,12 @@
 	- handle the presence of dates in events
 	- use the Labels from the dataset in the frontend directly
 	- handle event year values like 'Late 4th Millennium BC', '470~469 BCE', ...
+	- integrate all of the remaining dataset
+	- balance the random statement picking logic
+
+- add option to choose era in game preferences and implement logic
+
+- implement difficulty levels (easy: input range shortens based on era to help with guess)
 
 - Move scoring logic to server.
 
