@@ -1,8 +1,18 @@
+export type Dataset = {
+  ancient_history: Statement[];
+  post_classical?: Statement[];
+  early_modern?: Statement[];
+  late_modern?: Statement[];
+};
+
 export type Statement = {
   id: string;
   statement : string;
-  year : string;
-  img?: string;
+  year? : number;
+  yearLabel? : string;
+  yearRange?: [number, number];
+  yearRangeLabel? : string;
+  period?: string;
 };
 
 export type Player = {

@@ -3,7 +3,7 @@ import { createServer } from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
 import type { Player, PartySettings as Party, Statement } from "@guessera/types";
-import { statements } from './data/statements.js';
+import { dataset } from './data.js';
 
 const app = express();
 app.use(cors());
@@ -24,17 +24,20 @@ const generateRoomCode = (): string => {
   return Math.random().toString(36).substring(2, 6).toUpperCase();
 };
 
+const events: Statement[] = dataset.ancient_history;
+
 // Helper to pick a set of statements
 const pickRandomStatements = (n: number): Statement[] => {
   const chosenStatements = [];
   const usedIndices = new Set();
   while (chosenStatements.length < n) {
-    const randomIndex = Math.floor(Math.random() * statements.length);
+    const randomIndex = Math.floor(Math.random() * events.length);
     if (!usedIndices.has(randomIndex)) {
       usedIndices.add(randomIndex);
-      chosenStatements.push(statements[randomIndex]);
+      chosenStatements.push(events[randomIndex]);
     }
   }
+  console.log(chosenStatements);
   return chosenStatements;
 }
 
