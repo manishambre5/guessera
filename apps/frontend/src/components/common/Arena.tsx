@@ -22,6 +22,7 @@ export default function Arena({ onRoundEnd, gameSettings, partySettings }: Arena
     const [chosenStatements, setChosenStatements] = useState<Statement[]>([]);
     const [currentStatementIndex, setCurrentStatementIndex] = useState<number>(0);
     const [sliderValue, setSliderValue] = useState<number[]>([1]);
+    const [sliderRangeValue, setSliderRangeValue] = useState<number[]>([-999,500]);
     const [playerGuesses, setPlayerGuesses] = useState<PlayerGuess[]>([]);
     const [score, setScore] = useState<number>(0);
     const [round, setRound] = useState<number>(0); // to reset round timer
@@ -134,6 +135,7 @@ export default function Arena({ onRoundEnd, gameSettings, partySettings }: Arena
     useEffect(() => {
         if (gameSettings?.statements && gameSettings.statements.length > 0) {
             setChosenStatements(gameSettings.statements);
+            console.log(gameSettings.statements);
         }
     }, []);
 
@@ -165,7 +167,7 @@ export default function Arena({ onRoundEnd, gameSettings, partySettings }: Arena
         </header>
 
         {/* Statement section */}
-        <section className="flex-1 md:min-h-96 flex flex-col items-center">
+        <section className="flex-1 md:min-h-96 flex flex-col items-center justify-center">
             {gameOver ? (
                 <Card className="flex-1 flex flex-col justify-center aspect-video md:aspect-auto w-full">
                     <CardHeader className="flex flex-col items-center">
@@ -177,8 +179,8 @@ export default function Arena({ onRoundEnd, gameSettings, partySettings }: Arena
                     
                 </Card>
             ) : chosenStatements.length > 0 && currentStatementIndex < chosenStatements.length ? (
-                <Card className="flex-1 flex flex-col md:flex-row md:items-center relative size-full pt-0 md:py-0">
-                    <CardHeader className="md:h-fit h-fit md:flex-1 text-center">
+                <Card className="w-full">
+                    <CardHeader className="text-center">
                         <CardTitle className="md:text-xl lg:text-2xl">{chosenStatements[currentStatementIndex].statement}</CardTitle>
                     </CardHeader>
                 </Card>
@@ -209,28 +211,41 @@ export default function Arena({ onRoundEnd, gameSettings, partySettings }: Arena
                             <ChevronsLeft />
                         </Button>
                         <Field className='w-full'>
-                            <Slider
-                                min={oldestYear}
-                                max={currentYear}
-                                step={1}
-                                value={sliderValue}
-                                onValueChange={setSliderValue}
-                                className="py-4 bg-muted rounded-md"
-                            />
-                            <FieldLabel className='text-muted-foreground uppercase w-full flex justify-between'>
-                                {yearLabels.map((year, i) => (
-                                <div key={i}>
-                                    <span className={`border-r border-muted-foreground h-3 w-0 flex ${
-                                        i === 0 ? "mr-auto"
-                                        : i === 1 ? "m-auto"
-                                        : "ml-auto"
-                                    }`}></span>
-                                    <span key={i} className="text-xs">
-                                        {Math.abs(year)} {year < 0 ? "BCE" : "CE"}
-                                    </span>
-                                </div>
-                                ))}
-                            </FieldLabel>
+                        {chosenStatements.length > 0 && currentStatementIndex < chosenStatements.length && (
+                            chosenStatements[currentStatementIndex].year === null ? (
+                                <Slider
+                                    min={oldestYear}
+                                    max={currentYear}
+                                    step={1}
+                                    value={sliderRangeValue}
+                                    onValueChange={setSliderRangeValue}
+                                    className="py-4 bg-muted rounded-md"
+                                />
+                            ) : (
+                                <Slider
+                                    min={oldestYear}
+                                    max={currentYear}
+                                    step={1}
+                                    value={sliderValue}
+                                    onValueChange={setSliderValue}
+                                    className="py-4 bg-muted rounded-md"
+                                />
+                            )
+                        )}
+                        <FieldLabel className='text-muted-foreground uppercase w-full flex justify-between'>
+                            {yearLabels.map((year, i) => (
+                            <div key={i}>
+                                <span className={`border-r border-muted-foreground h-3 w-0 flex ${
+                                    i === 0 ? "mr-auto"
+                                    : i === 1 ? "m-auto"
+                                    : "ml-auto"
+                                }`}></span>
+                                <span key={i} className="text-xs">
+                                    {Math.abs(year)} {year < 0 ? "BCE" : "CE"}
+                                </span>
+                            </div>
+                            ))}
+                        </FieldLabel>
                         </Field>
                         <Button
                             type="button"
@@ -249,9 +264,18 @@ export default function Arena({ onRoundEnd, gameSettings, partySettings }: Arena
 
                     <Item variant="muted">
                         <ItemContent>
-                            <ItemTitle className="font-bold text-lg">
-                                {formatYear(sliderValue[0])}
-                            </ItemTitle>
+                            {chosenStatements.length > 0 && currentStatementIndex < chosenStatements.length && (
+                                chosenStatements[currentStatementIndex].year === null ? (
+                                    <ItemTitle className="font-bold text-lg">
+                                        {formatYear(sliderRangeValue[0])}
+                                        <span>-</span>
+                                        {formatYear(sliderRangeValue[1])}
+                                    </ItemTitle>
+                                ) : (
+                                    <ItemTitle className="font-bold text-lg">
+                                        {formatYear(sliderValue[0])}
+                                    </ItemTitle>
+                                ))}
                         </ItemContent>
                         <ItemActions>
                             <Button 
