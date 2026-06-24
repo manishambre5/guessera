@@ -41,6 +41,7 @@ export default function Arena({ onRoundEnd, gameSettings, partySettings }: Arena
         oldestYear + (i * (currentYear - oldestYear)) / (steps - 1);
         return Math.round(value);
     });
+    const isRangeSlider = chosenStatements.length > 0 &&  currentStatementIndex < chosenStatements.length && chosenStatements[currentStatementIndex].year === null;
 
     // Handle submit guess
     const handleSubmitGuess = (e?: React.SubmitEvent): void => {
@@ -89,30 +90,55 @@ export default function Arena({ onRoundEnd, gameSettings, partySettings }: Arena
     };
 
     // Slider thumb arrow button control
-    const moveSliderThumb = (direction: boolean): void => {
-        setSliderValue((prev) => {
-            const amount = direction === true ? 1 : -1;
-            return [
-                Math.min(
-                    currentYear,
-                    Math.max(oldestYear, prev[0] + amount)
-                ),
-            ];
-        });
+    const moveSliderThumb = (
+        step: 1 | -1,
+        thumbIndex: 0 | 1
+    ): void => {
+        const amount = step;
+
+        if (isRangeSlider) {
+            setSliderRangeValue((prev) => {
+                const next = [...prev];
+                const clamp = (v: number) => Math.min(currentYear, Math.max(oldestYear, v));
+                next[thumbIndex] = clamp(next[thumbIndex] + amount);
+
+                // Prevent thumbs from crossing
+                if (next.length === 2) {
+                    if (thumbIndex === 0) {
+                        next[0] = Math.min(next[0], next[1]);
+                    } else {
+                        next[1] = Math.max(next[1], next[0]);
+                    }
+                }
+                return next;
+            });
+        } else {
+            setSliderValue((prev) => {
+                return [
+                    Math.min(
+                        currentYear,
+                        Math.max(oldestYear, prev[0] + amount)
+                    ),
+                ];
+            });
+        }
     };
     // handle pointer (thumb mover button click/touch)
-    const handlePointerDown = (direction: boolean) => (e: React.PointerEvent) => {
+    const handlePointerDown = (step: 1 | -1, thumbIndex: 0 | 1) => (e: React.PointerEvent) => {
         e.currentTarget.setPointerCapture(e.pointerId);
-        startHolding(direction);
+        startHolding(step, thumbIndex);
     };
     const handlePointerUp = () => stopHolding();
     // Trigger Hold and Press
-    const startHolding = (direction: boolean): void => {
-        moveSliderThumb(direction); // act on click immediately
+    const startHolding = (
+        step: 1 | -1,
+        thumbIndex: 0 | 1
+    ): void => {
+        moveSliderThumb(step, thumbIndex); // act on click immediately
 
         const startTime = Date.now();
         const tick = () => {
-            moveSliderThumb(direction);
+            moveSliderThumb(step, thumbIndex);
             // elapsed hold time in seconds
             const holdTime = (Date.now() - startTime) / 1000;
 
@@ -141,7 +167,7 @@ export default function Arena({ onRoundEnd, gameSettings, partySettings }: Arena
 
 
   return (
-    <div className='flex flex-col gap-2 size-full justify-between lg:w-5/6 bg-background p-2 rounded-2xl'>
+    <div className='flex flex-col gap-2 size-full justify-between lg:w-5/6 bg-background p-2 rounded-t-lg rounded-b-2xl'>
 
         {/* Score and Timer */}
         <header className="h-fit flex flex-row-reverse gap-2 justify-between items-start">
@@ -159,7 +185,7 @@ export default function Arena({ onRoundEnd, gameSettings, partySettings }: Arena
                 <ItemContent>
                     <ItemTitle className="text-2xl">
                         {gameOver ? "00" :
-                            <Countdown key={round} limit={20} onComplete={handleSubmitGuess} />
+                            <Countdown key={round} limit={200} onComplete={handleSubmitGuess} />
                         }
                     </ItemTitle>
                 </ItemContent>
@@ -167,7 +193,7 @@ export default function Arena({ onRoundEnd, gameSettings, partySettings }: Arena
         </header>
 
         {/* Statement section */}
-        <section className="flex-1 md:min-h-96 flex flex-col items-center justify-center">
+        <section className="flex-1 md:min-h-96 flex flex-col items-center justify-center aspect-video">
             {gameOver ? (
                 <Card className="flex-1 flex flex-col justify-center aspect-video md:aspect-auto w-full">
                     <CardHeader className="flex flex-col items-center">
@@ -198,12 +224,12 @@ export default function Arena({ onRoundEnd, gameSettings, partySettings }: Arena
                     onSubmit={handleSubmitGuess}
                 >
                     {/* Guess Controls */}
-                    <div className="items-start flex gap-1">
+                    <div className="flex gap-1">
                         <Button
                             type="button"
                             variant="secondary"
                             size="icon-lg"
-                            onPointerDown={handlePointerDown(false)}
+                            onPointerDown={(e) => handlePointerDown(-1, 0)(e)}
                             onPointerUp={handlePointerUp}
                             onPointerLeave={handlePointerUp}
                             onPointerCancel={handlePointerUp}
@@ -211,28 +237,26 @@ export default function Arena({ onRoundEnd, gameSettings, partySettings }: Arena
                             <ChevronsLeft />
                         </Button>
                         <Field className='w-full'>
-                        {chosenStatements.length > 0 && currentStatementIndex < chosenStatements.length && (
-                            chosenStatements[currentStatementIndex].year === null ? (
-                                <Slider
-                                    min={oldestYear}
-                                    max={currentYear}
-                                    step={1}
-                                    value={sliderRangeValue}
-                                    onValueChange={setSliderRangeValue}
-                                    className="py-4 bg-muted rounded-md"
-                                />
-                            ) : (
-                                <Slider
-                                    min={oldestYear}
-                                    max={currentYear}
-                                    step={1}
-                                    value={sliderValue}
-                                    onValueChange={setSliderValue}
-                                    className="py-4 bg-muted rounded-md"
-                                />
-                            )
+                        {isRangeSlider ? (
+                            <Slider
+                                min={oldestYear}
+                                max={currentYear}
+                                step={1}
+                                value={sliderRangeValue}
+                                onValueChange={setSliderRangeValue}
+                                className="py-4"
+                            />
+                        ) : (
+                            <Slider
+                                min={oldestYear}
+                                max={currentYear}
+                                step={1}
+                                value={sliderValue}
+                                onValueChange={setSliderValue}
+                                className="py-4"
+                            />
                         )}
-                        <FieldLabel className='text-muted-foreground uppercase w-full flex justify-between'>
+                        <FieldLabel className='text-muted-foreground uppercase w-full flex justify-between -mt-4'>
                             {yearLabels.map((year, i) => (
                             <div key={i}>
                                 <span className={`border-r border-muted-foreground h-3 w-0 flex ${
@@ -251,7 +275,7 @@ export default function Arena({ onRoundEnd, gameSettings, partySettings }: Arena
                             type="button"
                             variant="secondary"
                             size="icon-lg"
-                            onPointerDown={handlePointerDown(true)}
+                            onPointerDown={(e) => handlePointerDown(1, 1)(e)}
                             onPointerUp={handlePointerUp}
                             onPointerLeave={handlePointerUp}
                             onPointerCancel={handlePointerUp}
@@ -264,18 +288,17 @@ export default function Arena({ onRoundEnd, gameSettings, partySettings }: Arena
 
                     <Item variant="muted">
                         <ItemContent>
-                            {chosenStatements.length > 0 && currentStatementIndex < chosenStatements.length && (
-                                chosenStatements[currentStatementIndex].year === null ? (
-                                    <ItemTitle className="font-bold text-lg">
-                                        {formatYear(sliderRangeValue[0])}
-                                        <span>-</span>
-                                        {formatYear(sliderRangeValue[1])}
-                                    </ItemTitle>
-                                ) : (
-                                    <ItemTitle className="font-bold text-lg">
-                                        {formatYear(sliderValue[0])}
-                                    </ItemTitle>
-                                ))}
+                            {isRangeSlider ? (
+                                <ItemTitle className="font-bold md:text-lg">
+                                    {formatYear(sliderRangeValue[0])}
+                                    <span>-</span>
+                                    {formatYear(sliderRangeValue[1])}
+                                </ItemTitle>
+                            ) : (
+                                <ItemTitle className="font-bold text-lg">
+                                    {formatYear(sliderValue[0])}
+                                </ItemTitle>
+                            )}
                         </ItemContent>
                         <ItemActions>
                             <Button 
