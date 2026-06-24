@@ -5,15 +5,27 @@ export type Dataset = {
   late_modern?: Statement[];
 };
 
-export type Statement = {
+export type StatementBase = {
   id: string;
-  statement : string;
-  year? : number;
-  yearLabel? : string;
-  yearRange?: [number, number];
-  yearRangeLabel? : string;
+  statement: string;
   period?: string;
 };
+
+export type Statement =
+  | (StatementBase & {
+      type: "event";
+      year: number;
+      yearLabel?: string;
+    })
+  | (StatementBase & {
+      type: "period";
+      yearRange: [number, number];
+      yearRangeLabel?: string;
+    });
+
+export type Guess = number | [number, number];
+
+export type SliderState = { value: [number] | [number, number] };
 
 export type Player = {
   name : string;
@@ -26,7 +38,7 @@ export type Player = {
 
 export type PlayerGuess = {
   statementId: string;
-  guessedYear: number;
+  guessedYear: Guess;
   guessScore: number;
 };
 

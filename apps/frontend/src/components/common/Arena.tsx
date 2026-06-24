@@ -4,7 +4,7 @@ import { Item, ItemActions, ItemContent, ItemHeader, ItemTitle } from "../ui/ite
 import { Field, FieldLabel, FieldSeparator } from "../ui/field";
 import { Slider } from "../ui/slider";
 import { Button } from "../ui/button";
-import type { GameRoundReport, GameSettings, PartySettings, PlayerGuess, Statement } from "@guessera/types";
+import type { GameRoundReport, GameSettings, Guess, PartySettings, PlayerGuess, SliderState, Statement } from "@guessera/types";
 import Countdown from "./Countdown";
 import formatYear from "@/utils/formatYear";
 import { ChevronsLeft, ChevronsRight, Smile } from "lucide-react";
@@ -21,8 +21,9 @@ export default function Arena({ onRoundEnd, gameSettings, partySettings }: Arena
     // STATES
     const [chosenStatements, setChosenStatements] = useState<Statement[]>([]);
     const [currentStatementIndex, setCurrentStatementIndex] = useState<number>(0);
-    const [sliderValue, setSliderValue] = useState<number[]>([1]);
-    const [sliderRangeValue, setSliderRangeValue] = useState<number[]>([-999,500]);
+    //const [sliderValue, setSliderValue] = useState<number[]>([1]);
+    //const [sliderRangeValue, setSliderRangeValue] = useState<number[]>([-999,500]);
+    const [sliderState, setSliderState] = useState<SliderState>({value: [0,0]});
     const [playerGuesses, setPlayerGuesses] = useState<PlayerGuess[]>([]);
     const [score, setScore] = useState<number>(0);
     const [round, setRound] = useState<number>(0); // to reset round timer
@@ -41,22 +42,39 @@ export default function Arena({ onRoundEnd, gameSettings, partySettings }: Arena
         oldestYear + (i * (currentYear - oldestYear)) / (steps - 1);
         return Math.round(value);
     });
-    const isRangeSlider = chosenStatements.length > 0 &&  currentStatementIndex < chosenStatements.length && chosenStatements[currentStatementIndex].year === null;
+    const statement = chosenStatements[currentStatementIndex];
+    const isRangeSlider = statement?.type === "period";
 
     // Handle submit guess
     const handleSubmitGuess = (e?: React.SubmitEvent): void => {
         if (e) e.preventDefault();
+        console.log(sliderState.value);
+        console.log(chosenStatements[currentStatementIndex].type);
         
         // calculate the score
-        const calculatedScore = calculateScore(sliderValue[0], Number(chosenStatements[currentStatementIndex].year));
+        const statement = chosenStatements[currentStatementIndex];
+        if (!statement) return;
+
+        const actual =
+            statement.type === "period"
+                ? statement.yearRange
+                : statement.year;
+
+        const guess: Guess = isRangeSlider
+            ? sliderState.value as [number, number]
+            : sliderState.value[0];
+
+        const calculatedScore = calculateScore(guess, actual);
         
         // update score state
         setScore((prevScore) => prevScore + calculatedScore);
 
         // build guess object for report
         const guessData: PlayerGuess = {
-            statementId: chosenStatements[currentStatementIndex].id,
-            guessedYear: sliderValue[0],
+            statementId: statement.id,
+            guessedYear: isRangeSlider
+                ? sliderState.value as [number, number]
+                : sliderState.value[0],
             guessScore: calculatedScore,
         };
         // updating player guess data for report
@@ -90,38 +108,22 @@ export default function Arena({ onRoundEnd, gameSettings, partySettings }: Arena
     };
 
     // Slider thumb arrow button control
-    const moveSliderThumb = (
-        step: 1 | -1,
-        thumbIndex: 0 | 1
-    ): void => {
-        const amount = step;
+    const moveSliderThumb = (step: 1 | -1, thumbIndex: 0 | 1) => {
+        setSliderState((prev) => {
+            const next = [...prev.value] as [number] | [number, number];
 
-        if (isRangeSlider) {
-            setSliderRangeValue((prev) => {
-                const next = [...prev];
-                const clamp = (v: number) => Math.min(currentYear, Math.max(oldestYear, v));
-                next[thumbIndex] = clamp(next[thumbIndex] + amount);
+            next[thumbIndex] = Math.min(
+                currentYear,
+                Math.max(oldestYear, (next[thumbIndex] ?? next[0]) + step)
+            );
 
-                // Prevent thumbs from crossing
-                if (next.length === 2) {
-                    if (thumbIndex === 0) {
-                        next[0] = Math.min(next[0], next[1]);
-                    } else {
-                        next[1] = Math.max(next[1], next[0]);
-                    }
-                }
-                return next;
-            });
-        } else {
-            setSliderValue((prev) => {
-                return [
-                    Math.min(
-                        currentYear,
-                        Math.max(oldestYear, prev[0] + amount)
-                    ),
-                ];
-            });
-        }
+            if (next.length === 2) {
+                if (thumbIndex === 0) next[0] = Math.min(next[0], next[1]);
+                else next[1] = Math.max(next[1], next[0]);
+            }
+
+            return { value: next };
+        });
     };
     // handle pointer (thumb mover button click/touch)
     const handlePointerDown = (step: 1 | -1, thumbIndex: 0 | 1) => (e: React.PointerEvent) => {
@@ -163,7 +165,20 @@ export default function Arena({ onRoundEnd, gameSettings, partySettings }: Arena
             setChosenStatements(gameSettings.statements);
             console.log(gameSettings.statements);
         }
-    }, []);
+    }, [gameSettings]);
+
+    useEffect(() => {
+        const statement = chosenStatements[currentStatementIndex];
+
+        if (!statement) return;
+
+        setSliderState({
+            value:
+                statement.type === "period"
+                    ? [-999, 500]
+                    : [0],
+        });
+    }, [chosenStatements, currentStatementIndex]);
 
 
   return (
@@ -237,25 +252,19 @@ export default function Arena({ onRoundEnd, gameSettings, partySettings }: Arena
                             <ChevronsLeft />
                         </Button>
                         <Field className='w-full'>
-                        {isRangeSlider ? (
                             <Slider
                                 min={oldestYear}
                                 max={currentYear}
                                 step={1}
-                                value={sliderRangeValue}
-                                onValueChange={setSliderRangeValue}
-                                className="py-4"
+                                value={sliderState.value}
+                                onValueChange={(val) => {
+                                    setSliderState({
+                                        value: isRangeSlider
+                                            ? val as [number, number]
+                                            : [val[0]] as [number],
+                                    });
+                                }}
                             />
-                        ) : (
-                            <Slider
-                                min={oldestYear}
-                                max={currentYear}
-                                step={1}
-                                value={sliderValue}
-                                onValueChange={setSliderValue}
-                                className="py-4"
-                            />
-                        )}
                         <FieldLabel className='text-muted-foreground uppercase w-full flex justify-between -mt-4'>
                             {yearLabels.map((year, i) => (
                             <div key={i}>
@@ -288,15 +297,15 @@ export default function Arena({ onRoundEnd, gameSettings, partySettings }: Arena
 
                     <Item variant="muted">
                         <ItemContent>
-                            {isRangeSlider ? (
+                            {statement?.type === "period" && sliderState.value.length === 2 ? (
                                 <ItemTitle className="font-bold md:text-lg">
-                                    {formatYear(sliderRangeValue[0])}
+                                    {formatYear(sliderState.value[0])}
                                     <span>-</span>
-                                    {formatYear(sliderRangeValue[1])}
+                                    {formatYear(sliderState.value[1])}
                                 </ItemTitle>
                             ) : (
                                 <ItemTitle className="font-bold text-lg">
-                                    {formatYear(sliderValue[0])}
+                                    {formatYear(sliderState.value[0])}
                                 </ItemTitle>
                             )}
                         </ItemContent>

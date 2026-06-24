@@ -82,14 +82,21 @@ export function normalizeAncientHistory(rawData: RawData[]): Statement[] {
 			const isRange = Array.isArray(typeCasted);
 
 			return {
-				id: `A${counter++}`,
-				statement: event.event,
-				year: isRange ? NaN : typeCasted,
-				yearLabel: isRange ? undefined : normalizeYearLabel(event.year),
-				yearRange: isRange ? typeCasted : undefined,
-				yearRangeLabel: isRange ? normalizeYearLabel(event.year) : undefined,
-				period: era.era,
-			};
+                id: `A${counter++}`,
+                statement: event.event,
+                ...(isRange
+                    ? {
+                        type: "period",
+                        yearRange: typeCasted,
+                        yearRangeLabel: normalizeYearLabel(event.year),
+                    }
+                    : {
+                        type: "event",
+                        year: typeCasted,
+                        yearLabel: normalizeYearLabel(event.year),
+                    }),
+                period: era.era,
+            };
 		})
 	);
 }

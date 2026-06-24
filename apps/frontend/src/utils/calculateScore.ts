@@ -1,7 +1,28 @@
-export default function calculateScore(guess: number, actual: number): number {
+function toRange(v: number | number[]): [number, number] {
+    if (Array.isArray(v)) {
+        if (v.length === 1) return [v[0], v[0]];
+        return [v[0], v[1]];
+    }
+    return [v, v];
+}
+function rangeDistance(
+    [a1, a2]: [number, number],
+    [b1, b2]: [number, number]
+): number {
+    if (a2 < b1) return b1 - a2;
+    if (b2 < a1) return a1 - b2;
+    return 0; // overlap
+}
+export default function calculateScore(
+    guess: number | number[],
+    actual: number | [number, number]
+): number {
     const maxDifference = 2000;
     const maxScore = 1000;
-    const difference = Math.abs(guess - actual);
+    const guessRange = toRange(guess);
+    const actualRange = toRange(actual);
+
+    const difference = rangeDistance(guessRange, actualRange);
 
     if (difference >= maxDifference) return 0;
 
