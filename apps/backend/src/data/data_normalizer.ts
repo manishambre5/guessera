@@ -1,11 +1,24 @@
 import { Statement } from "@guessera/types";
 
-type RawData = {
+type RawDataA = {
 	era: string;
 	events: {
 		year: string;
 		event: string;
 	}[];
+};
+
+type RawDataB = {
+	era: string;
+    sections: {
+        title: string;
+        events: {
+            year: string;
+            date?: string;
+            event: string;
+            description?: string;
+        }[];
+    }[];
 };
 
 const normalizeYearLabel = (year: string): string => {
@@ -74,7 +87,90 @@ const typeCastYear = (year: string): number | [number, number] => {
     return convertYear(year);
 };
 
-export function normalizeAncientHistory(rawData: RawData[]): Statement[] {
+export function normalizeAncientHistory(rawData: RawDataA[]): Statement[] {
+	let counter = 1;
+	return rawData.flatMap((era) =>
+		era.events.map((event) => {
+			const typeCasted = typeCastYear(event.year);
+			const isRange = Array.isArray(typeCasted);
+
+			return {
+                id: `A${counter++}`,
+                statement: event.event,
+                ...(isRange
+                    ? {
+                        type: "period",
+                        yearRange: typeCasted,
+                        yearRangeLabel: normalizeYearLabel(event.year),
+                    }
+                    : {
+                        type: "event",
+                        year: typeCasted,
+                        yearLabel: normalizeYearLabel(event.year),
+                    }),
+                period: era.era,
+            };
+		})
+	);
+}
+
+export function normalizePostClassicalHistory(rawData: RawDataB[]): Statement[] {
+	let counter = 1;
+	return rawData.flatMap((era) =>
+        era.sections.flatMap((section) =>
+            section.events.map((event) => {
+			const typeCasted = typeCastYear(event.year);
+			const isRange = Array.isArray(typeCasted);
+
+			return {
+                id: `A${counter++}`,
+                statement: event.event,
+                ...(isRange
+                    ? {
+                        type: "period",
+                        yearRange: typeCasted,
+                        yearRangeLabel: normalizeYearLabel(event.year),
+                    }
+                    : {
+                        type: "event",
+                        year: typeCasted,
+                        yearLabel: normalizeYearLabel(event.year),
+                    }),
+                period: era.era,
+            };
+		})
+	));
+}
+
+export function normalizeEarlyModernHistory(rawData: RawDataB[]): Statement[] {
+	let counter = 1;
+	return rawData.flatMap((era) =>
+        era.sections.flatMap((section) =>
+            section.events.map((event) => {
+			const typeCasted = typeCastYear(event.year);
+			const isRange = Array.isArray(typeCasted);
+
+			return {
+                id: `A${counter++}`,
+                statement: event.event,
+                ...(isRange
+                    ? {
+                        type: "period",
+                        yearRange: typeCasted,
+                        yearRangeLabel: normalizeYearLabel(event.year),
+                    }
+                    : {
+                        type: "event",
+                        year: typeCasted,
+                        yearLabel: normalizeYearLabel(event.year),
+                    }),
+                period: era.era,
+            };
+		})
+	));
+}
+
+export function normalizeLateModernHistory(rawData: RawDataA[]): Statement[] {
 	let counter = 1;
 	return rawData.flatMap((era) =>
 		era.events.map((event) => {

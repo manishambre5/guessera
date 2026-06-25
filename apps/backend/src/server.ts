@@ -24,7 +24,12 @@ const generateRoomCode = (): string => {
   return Math.random().toString(36).substring(2, 6).toUpperCase();
 };
 
-const events: Statement[] = dataset.ancient_history;
+const events: Statement[] = [
+  ...dataset.ancient_history,
+  ...(dataset.post_classical ?? []),
+  ...(dataset.early_modern ?? []),
+  ...(dataset.late_modern ?? []),
+];
 
 // Helper to pick a set of statements
 const pickRandomStatements = (n: number): Statement[] => {
