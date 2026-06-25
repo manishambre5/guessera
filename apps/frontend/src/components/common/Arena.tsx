@@ -48,7 +48,6 @@ export default function Arena({ onRoundEnd, gameSettings, partySettings }: Arena
     // Handle submit guess
     const handleSubmitGuess = (e?: React.SubmitEvent): void => {
         if (e) e.preventDefault();
-        console.log(sliderState.value);
         console.log(chosenStatements[currentStatementIndex].type);
         
         // calculate the score

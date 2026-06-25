@@ -73,7 +73,10 @@ const RoundReport: React.FC<GameRoundReportProps> = ({ chosenStatements, report,
                     </TableCell>
                     
                     <TableCell className="text-center">
-                      {formatYear(Number(matchedStatement?.year))}
+                      {matchedStatement?.type === "period"
+                        ? (matchedStatement?.yearRangeLabel)
+                        : (matchedStatement?.yearLabel)
+                      }
                     </TableCell>
 
                     {mode === "multi" && leaderboard ? (
@@ -97,7 +100,15 @@ const RoundReport: React.FC<GameRoundReportProps> = ({ chosenStatements, report,
                     ) : (
                       <>
                         <TableCell className="text-center">
-                          {formatYear(item.guessedYear)}
+                          {Array.isArray(item.guessedYear)
+                              ? (
+                                <>
+                                  {formatYear(item.guessedYear[0])}
+                                  <span> - </span>
+                                  {formatYear(item.guessedYear[1])}
+                                </>)
+                              : formatYear(item.guessedYear)
+                          }
                         </TableCell>
                         <TableCell className="text-center bg-accent font-semibold">
                           {item.guessScore}

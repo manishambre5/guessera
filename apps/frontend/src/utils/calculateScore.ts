@@ -26,7 +26,7 @@ export default function calculateScore(
 
     if (difference >= maxDifference) return 0;
 
-    // exponential scoring to reward close guesses well
+    // exponential scoring to reward close guesses
     const normalized = 1 - difference / maxDifference; // 1.0 perfect, 0.0 at maxDiff
     const result = Math.round(maxScore * Math.pow(normalized, 3)); // cubic/exponential curve
 
