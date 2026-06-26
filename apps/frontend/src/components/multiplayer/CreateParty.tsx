@@ -46,7 +46,7 @@ export default function CreateParty({ onSetPartySettings, onGoHome }: CreatePart
     }, [onSetPartySettings]);
 
   return (
-    <Card className="lg:w-1/2 w-full">
+    <Card className="md:w-2/3 lg:w-2/5 w-full">
         <CardHeader className="text-center">
             <CardTitle className="text-2xl">Create Party</CardTitle>
             <CardDescription>Create a party to invite friends for a multiplayer game!</CardDescription>

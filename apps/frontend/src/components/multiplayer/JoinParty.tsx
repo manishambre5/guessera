@@ -50,7 +50,7 @@ export default function JoinParty({ onGoHome, onPartySettings }: JoinPartyProps)
     }, [onPartySettings]);
 
   return (
-    <Card className="lg:w-1/2 w-full">
+    <Card className="md:w-2/3 lg:w-2/5 w-full">
         <CardHeader className="text-center">
             <CardTitle className="text-2xl">Join Party</CardTitle>
             <CardDescription>Join a party to play with friends!</CardDescription>

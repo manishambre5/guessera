@@ -2,7 +2,7 @@ import { Check, ChevronsUpDown } from "lucide-react";
 import { Button } from "../ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui/collapsible";
 import { Field, FieldLabel, FieldSet } from "../ui/field";
-import { Item, ItemContent } from "../ui/item";
+import { Item } from "../ui/item";
 import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group";
 import type { GameDifficulty, GameEra, GamePreferences } from "@guessera/types";
 import { useState } from "react";
@@ -35,17 +35,17 @@ export default function Preferences({ onSetGamePreferences }: PreferencesProps) 
                 onOpenChange={setIsCollapsibleOpen}
                 className="flex flex-col items-start w-full gap-2"
             >
-                <Item>
-                    <ItemContent className="uppercase">Game Preferences</ItemContent>
-                    <CollapsibleTrigger asChild>
-                        <Button variant="ghost" size="icon" className="size-8">
-                            <ChevronsUpDown />
-                            <span className="sr-only">Toggle preferences</span>
-                        </Button>
-                    </CollapsibleTrigger>
-                </Item>
 
-                <CollapsibleContent className="flex flex-col gap-2 items-start flex-wrap">
+                <CollapsibleTrigger asChild>
+                    <Button variant="secondary" className="w-fit">
+                        <span className="uppercase font-normal">Game Preferences</span>
+                        <ChevronsUpDown />
+                        <span className="sr-only">Toggle preferences</span>
+                    </Button>
+                </CollapsibleTrigger>
+
+
+                <CollapsibleContent className="flex flex-col gap-2 items-start flex-wrap animate-collapsible-down">
                     <Item variant="outline">
                     <Field orientation="horizontal">
                         <FieldLabel>Difficulty</FieldLabel>
@@ -138,21 +138,21 @@ export default function Preferences({ onSetGamePreferences }: PreferencesProps) 
 
                     </Item>
 
-                    <Item>
-                        {saveAlert ? (
+
+                    {saveAlert ? (
+                        <Button
+                            variant="secondary"
+                            type="button"
+                            disabled
+                        ><Check className="animate-in fade-in fade-out duration-300" />Saved</Button>
+                    ) : (
                             <Button
-                                variant="default"
-                                type="button"
-                                disabled
-                            ><Check className="animate-in fade-in fade-out duration-300" />Saved</Button>
-                        ) : (
-                                <Button
-                                variant="default"
-                                onClick={updatePreferences}
-                                type="button"
-                            >Save</Button>
-                        )}
-                    </Item>
+                            variant="secondary"
+                            onClick={updatePreferences}
+                            type="button"
+                        >Save</Button>
+                    )}
+
 
                 </CollapsibleContent>
             </Collapsible>

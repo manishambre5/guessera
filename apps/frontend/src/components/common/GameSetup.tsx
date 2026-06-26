@@ -6,6 +6,9 @@ import { Separator } from "../ui/separator";
 import { useState } from "react";
 import { type GamePreferences, type GameMode, type GameSettings, type MultiPlayerAction } from "@guessera/types";
 import Preferences from "./Preferences";
+import { ArrowUpRight } from "lucide-react";
+import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
+import About from "./About";
 
 type GameSetupProps = {
   onStart: (preferences: GamePreferences) => void;
@@ -28,11 +31,15 @@ function GameSetup({ onStart, onMultiplayerMode, onSetGameSettings }: GameSetupP
     };
 
   return (
+    <Sheet>
     <Card className="md:w-2/3 lg:w-2/5 w-full">
         <CardHeader className="text-center">
             <CardTitle className="text-2xl font-light flex flex-col gap-2">
                 <span>Welcome to </span>
-                <span className="font-logo text-chart-4 italic font-bold text-7xl">GuessEra</span></CardTitle>
+                <SheetTrigger asChild>
+                    <span className="font-logo text-chart-4 italic font-bold text-7xl cursor-pointer">GuessEra</span>
+                </SheetTrigger>
+            </CardTitle>
             <CardDescription>Guess the year when a historical event occurred!</CardDescription>
         </CardHeader>
 
@@ -84,7 +91,7 @@ function GameSetup({ onStart, onMultiplayerMode, onSetGameSettings }: GameSetupP
         </CardContent>
         <CardFooter>
             {mode === "single" ? (
-                <div className="flex items-center justify-center gap-4 w-full">
+                <div className="flex-1">
                     <Button
                         size="lg"
                         onClick={() => updateSettings(null)}
@@ -94,7 +101,7 @@ function GameSetup({ onStart, onMultiplayerMode, onSetGameSettings }: GameSetupP
                     </Button>
                 </div>
             ) : (
-                <div className="flex items-center justify-center gap-4 w-full">
+                <div className="flex-1 space-x-2">
                     <Button
                         size="lg"
                         onClick={() => updateSettings("create")}
@@ -111,8 +118,19 @@ function GameSetup({ onStart, onMultiplayerMode, onSetGameSettings }: GameSetupP
                     </Button>
                 </div>
             )}
+            <Button variant="link" size="xs" asChild>
+                <a href="https://github.com/manishambre5/guessera">
+                    <span>source code</span>
+                    <ArrowUpRight />
+                </a>
+            </Button>
         </CardFooter>
     </Card>
+
+    <SheetContent>
+        <About />
+    </SheetContent>
+    </Sheet>
   );
 }
 
