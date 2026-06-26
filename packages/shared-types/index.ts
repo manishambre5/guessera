@@ -8,7 +8,8 @@ export type Dataset = {
 export type StatementBase = {
   id: string;
   statement: string;
-  period?: string;
+  eraLabel: string;
+  periodLabel: string;
 };
 
 export type Statement =
@@ -26,6 +27,8 @@ export type Statement =
 export type Guess = number | [number, number];
 
 export type SliderState = { value: [number] | [number, number] };
+
+export type StateTimePeriod = { }
 
 export type Player = {
   name : string;
@@ -50,6 +53,7 @@ export type GameRoundReport = {
 export type GameMode = "single" | "multi";
 export type GameDifficulty = "easy" | "medium" | "hard";
 export type Era = "ancient" | "post-classical" | "early-modern" | "late-modern";
+//export type Period = "early-history" | "classical-antiquity" | "common-era" | "early-post-classical" | "middle-post-classical" | "late-post-classical" | "early-modern" | "late-modern";
 export type GameEra = Era[];
 export type MultiPlayerAction = "create" | "join" | null;
 

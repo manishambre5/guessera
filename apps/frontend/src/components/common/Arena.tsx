@@ -10,6 +10,7 @@ import formatYear from "@/utils/formatYear";
 import { ChevronsLeft, ChevronsRight, Smile } from "lucide-react";
 import calculateScore from "@/utils/calculateScore";
 import { socket } from "@/utils/socket";
+import { eraBounds, periodBounds } from "@/utils/bounds";
 
 type ArenaProps = {
   gameSettings?: GameSettings;
@@ -21,8 +22,6 @@ export default function Arena({ onRoundEnd, gameSettings, partySettings }: Arena
     // STATES
     const [chosenStatements, setChosenStatements] = useState<Statement[]>([]);
     const [currentStatementIndex, setCurrentStatementIndex] = useState<number>(0);
-    //const [sliderValue, setSliderValue] = useState<number[]>([1]);
-    //const [sliderRangeValue, setSliderRangeValue] = useState<number[]>([-999,500]);
     const [sliderState, setSliderState] = useState<SliderState>({value: [0,0]});
     const [playerGuesses, setPlayerGuesses] = useState<PlayerGuess[]>([]);
     const [score, setScore] = useState<number>(0);
@@ -33,15 +32,8 @@ export default function Arena({ onRoundEnd, gameSettings, partySettings }: Arena
     const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null); // for smooth hold and press speed increase
 
     // CONSTANTS
-    const currentYear: number = new Date().getFullYear();
-    const oldestYear: number = -4999;
-    // for slider range labels
-    const steps: number = 3;
-    const yearLabels: number[] = Array.from({ length: steps }, (_, i) => {
-        const value =
-        oldestYear + (i * (currentYear - oldestYear)) / (steps - 1);
-        return Math.round(value);
-    });
+    const currentYear: number = 2000;
+    const oldestYear: number = -3199;
     const statement = chosenStatements[currentStatementIndex];
     const isRangeSlider = statement?.type === "period";
 
@@ -199,7 +191,7 @@ export default function Arena({ onRoundEnd, gameSettings, partySettings }: Arena
                 <ItemContent>
                     <ItemTitle className="text-2xl">
                         {gameOver ? "00" :
-                            <Countdown key={round} limit={200} onComplete={handleSubmitGuess} />
+                            <Countdown key={round} limit={20} onComplete={handleSubmitGuess} />
                         }
                     </ItemTitle>
                 </ItemContent>
@@ -252,8 +244,18 @@ export default function Arena({ onRoundEnd, gameSettings, partySettings }: Arena
                         </Button>
                         <Field className='w-full'>
                             <Slider
-                                min={oldestYear}
-                                max={currentYear}
+                                min={
+                                    !statement ? oldestYear :
+                                    gameSettings?.difficulty === "easy" ? periodBounds(statement.periodLabel)[0]
+                                    : gameSettings?.difficulty === "medium" ? eraBounds(statement.eraLabel)[0]
+                                    : oldestYear
+                                }
+                                max={
+                                    !statement ? currentYear :
+                                    gameSettings?.difficulty === "easy" ? periodBounds(statement.periodLabel)[1]
+                                    : gameSettings?.difficulty === "medium" ? eraBounds(statement.eraLabel)[1]
+                                    : currentYear
+                                }
                                 step={1}
                                 value={sliderState.value}
                                 onValueChange={(val) => {
@@ -263,20 +265,25 @@ export default function Arena({ onRoundEnd, gameSettings, partySettings }: Arena
                                             : [val[0]] as [number],
                                     });
                                 }}
+                                className="py-4"
                             />
-                        <FieldLabel className='text-muted-foreground uppercase w-full flex justify-between -mt-4'>
-                            {yearLabels.map((year, i) => (
-                            <div key={i}>
-                                <span className={`border-r border-muted-foreground h-3 w-0 flex ${
-                                    i === 0 ? "mr-auto"
-                                    : i === 1 ? "m-auto"
-                                    : "ml-auto"
-                                }`}></span>
-                                <span key={i} className="text-xs">
-                                    {Math.abs(year)} {year < 0 ? "BCE" : "CE"}
+                        <FieldLabel className='text-muted-foreground w-full flex flex-col -mt-4 gap-0'>
+                            <div className="flex w-full">
+                                <span className="border-r border-muted-foreground h-3 w-0 mr-auto" />
+                                <span className="border-r border-muted-foreground h-3 w-0 m-auto" />
+                                <span className="border-r border-muted-foreground h-3 w-0 ml-auto" />
+                            </div>
+                            <div className="flex w-full">
+                                <span className="text-xs mr-auto">
+                                    {"upperbound"}
+                                </span>
+                                <span className="text-xs m-auto">
+                                    {"middle"}
+                                </span>
+                                <span className="text-xs ml-auto">
+                                    {"lowerbound"}
                                 </span>
                             </div>
-                            ))}
                         </FieldLabel>
                         </Field>
                         <Button

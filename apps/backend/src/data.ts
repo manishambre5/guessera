@@ -7,8 +7,8 @@ import { normalizeA } from "./data/data_normalizer.js";
 import { normalizeB } from "./data/data_normalizer.js";
 
 export const dataset: Dataset = {
-  ancient_history: normalizeA(A),
-  post_classical: normalizeB(B),
-  early_modern: normalizeB(C),
-  late_modern: normalizeA(D),
+  ancient_history: normalizeA(A, "Ancient"),
+  post_classical: normalizeB(B, "Post Classical"),
+  early_modern: normalizeB(C, "Early Modern"),
+  late_modern: normalizeA(D, "Late Modern"),
 };

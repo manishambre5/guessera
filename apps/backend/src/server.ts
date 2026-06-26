@@ -2,7 +2,7 @@ import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
-import type { Player, PartySettings as Party, Statement } from "@guessera/types";
+import type { Player, PartySettings as Party, Statement, GameSettings } from "@guessera/types";
 import { dataset } from './data.js';
 
 const app = express();
@@ -223,12 +223,13 @@ io.on("connection", (socket) => {
   })
 
   // SINGLE PLAYER GAME
-  socket.on("request_single_game", ({ noOfStatements = 5 }) => {
+  socket.on("request_single_game", ({ noOfStatements = 5, difficulty = "easy" }) => {
     const pickedStatements = pickRandomStatements(noOfStatements);
 
     const singlePlayerSettings = {
         mode: "single",
         noOfStatements,
+        difficulty,
         statements: pickedStatements
     };
 

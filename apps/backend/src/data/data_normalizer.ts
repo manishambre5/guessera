@@ -87,7 +87,7 @@ const typeCastYear = (year: string): number | [number, number] => {
     return convertYear(year);
 };
 
-export function normalizeA(rawData: RawDataA[]): Statement[] {
+export function normalizeA(rawData: RawDataA[], eraLabel:string): Statement[] {
 	let counter = 1;
 	return rawData.flatMap((era) =>
 		era.events.map((event) => {
@@ -108,13 +108,14 @@ export function normalizeA(rawData: RawDataA[]): Statement[] {
                         year: typeCasted,
                         yearLabel: normalizeYearLabel(event.year),
                     }),
-                period: era.era,
+                periodLabel: era.era,
+                eraLabel: eraLabel,
             };
 		})
 	);
 }
 
-export function normalizeB(rawData: RawDataB[]): Statement[] {
+export function normalizeB(rawData: RawDataB[], eraLabel: string): Statement[] {
 	let counter = 1;
 	return rawData.flatMap((era) =>
         era.sections.flatMap((section) =>
@@ -136,7 +137,8 @@ export function normalizeB(rawData: RawDataB[]): Statement[] {
                         year: typeCasted,
                         yearLabel: normalizeYearLabel(event.year),
                     }),
-                period: era.era,
+                periodLabel: era.era,
+                eraLabel: eraLabel,
             };
 		})
 	));
