@@ -1,3 +1,5 @@
+//TODO: tweak logic such that score is calculated relative to the era range (eg. Early Modern History -> 1500 - 1899 CE)
+
 function toRange(v: number | number[]): [number, number] {
     if (Array.isArray(v)) {
         if (v.length === 1) return [v[0], v[0]];
@@ -5,6 +7,7 @@ function toRange(v: number | number[]): [number, number] {
     }
     return [v, v];
 }
+
 function rangeDistance(
     [a1, a2]: [number, number],
     [b1, b2]: [number, number]
@@ -13,6 +16,7 @@ function rangeDistance(
     if (b2 < a1) return a1 - b2;
     return 0; // overlap
 }
+
 export default function calculateScore(
     guess: number | number[],
     actual: number | [number, number]

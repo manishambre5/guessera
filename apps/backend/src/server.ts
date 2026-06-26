@@ -24,6 +24,7 @@ const generateRoomCode = (): string => {
   return Math.random().toString(36).substring(2, 6).toUpperCase();
 };
 
+//TODO: add balanced picking of statements across eras
 const events: Statement[] = [
   ...dataset.ancient_history,
   ...(dataset.post_classical ?? []),

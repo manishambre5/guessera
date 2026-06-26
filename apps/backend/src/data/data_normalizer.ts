@@ -87,7 +87,7 @@ const typeCastYear = (year: string): number | [number, number] => {
     return convertYear(year);
 };
 
-export function normalizeAncientHistory(rawData: RawDataA[]): Statement[] {
+export function normalizeA(rawData: RawDataA[]): Statement[] {
 	let counter = 1;
 	return rawData.flatMap((era) =>
 		era.events.map((event) => {
@@ -114,7 +114,7 @@ export function normalizeAncientHistory(rawData: RawDataA[]): Statement[] {
 	);
 }
 
-export function normalizePostClassicalHistory(rawData: RawDataB[]): Statement[] {
+export function normalizeB(rawData: RawDataB[]): Statement[] {
 	let counter = 1;
 	return rawData.flatMap((era) =>
         era.sections.flatMap((section) =>
@@ -140,59 +140,4 @@ export function normalizePostClassicalHistory(rawData: RawDataB[]): Statement[] 
             };
 		})
 	));
-}
-
-export function normalizeEarlyModernHistory(rawData: RawDataB[]): Statement[] {
-	let counter = 1;
-	return rawData.flatMap((era) =>
-        era.sections.flatMap((section) =>
-            section.events.map((event) => {
-			const typeCasted = typeCastYear(event.year);
-			const isRange = Array.isArray(typeCasted);
-
-			return {
-                id: `A${counter++}`,
-                statement: event.event,
-                ...(isRange
-                    ? {
-                        type: "period",
-                        yearRange: typeCasted,
-                        yearRangeLabel: normalizeYearLabel(event.year),
-                    }
-                    : {
-                        type: "event",
-                        year: typeCasted,
-                        yearLabel: normalizeYearLabel(event.year),
-                    }),
-                period: era.era,
-            };
-		})
-	));
-}
-
-export function normalizeLateModernHistory(rawData: RawDataA[]): Statement[] {
-	let counter = 1;
-	return rawData.flatMap((era) =>
-		era.events.map((event) => {
-			const typeCasted = typeCastYear(event.year);
-			const isRange = Array.isArray(typeCasted);
-
-			return {
-                id: `A${counter++}`,
-                statement: event.event,
-                ...(isRange
-                    ? {
-                        type: "period",
-                        yearRange: typeCasted,
-                        yearRangeLabel: normalizeYearLabel(event.year),
-                    }
-                    : {
-                        type: "event",
-                        year: typeCasted,
-                        yearLabel: normalizeYearLabel(event.year),
-                    }),
-                period: era.era,
-            };
-		})
-	);
 }

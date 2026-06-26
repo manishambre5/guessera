@@ -49,6 +49,8 @@ export type GameRoundReport = {
 
 export type GameMode = "single" | "multi";
 export type GameDifficulty = "easy" | "medium" | "hard";
+export type Era = "ancient" | "post-classical" | "early-modern" | "late-modern";
+export type GameEra = Era[];
 export type MultiPlayerAction = "create" | "join" | null;
 
 export type GamePreferences = {

@@ -28,9 +28,11 @@ function GameSetup({ onStart, onMultiplayerMode, onSetGameSettings }: GameSetupP
     };
 
   return (
-    <Card className="lg:w-1/2 w-full">
+    <Card className="md:w-2/3 lg:w-2/5 w-full">
         <CardHeader className="text-center">
-            <CardTitle className="text-3xl">Welcome to <span className="font-logo text-chart-4 italic font-bold text-4xl">GuessEra</span></CardTitle>
+            <CardTitle className="text-2xl font-light flex flex-col gap-2">
+                <span>Welcome to </span>
+                <span className="font-logo text-chart-4 italic font-bold text-7xl">GuessEra</span></CardTitle>
             <CardDescription>Guess the year when a historical event occurred!</CardDescription>
         </CardHeader>
 
