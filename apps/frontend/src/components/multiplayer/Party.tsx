@@ -18,7 +18,7 @@ type PartyProps = {
 
 export default function Party({ onGoHome, partySettings, roundHistory }: PartyProps) {
     // LOCAL STATES
-    const [gamePreferences, setGamePreferences] = useState<GamePreferences>({ noOfStatements: 5, difficulty: "easy" });
+    const [gamePreferences, setGamePreferences] = useState<GamePreferences>({ noOfStatements: 5, difficulty: "easy", era: ["ancient", "post_classical", "early_modern", "late_modern"] });
     const [error, setError] = useState("");
     const isHost = partySettings.players.find(p => p.id === socket.id)?.isHost ?? false;
 
