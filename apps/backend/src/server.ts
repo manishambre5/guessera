@@ -2,7 +2,7 @@ import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
-import type { Player, PartySettings as Party, Statement, GameSettings } from "@guessera/types";
+import type { Player, PartySettings as Party, Statement, GameEra } from "@guessera/types";
 import { dataset } from './data.js';
 
 const app = express();
@@ -24,26 +24,30 @@ const generateRoomCode = (): string => {
   return Math.random().toString(36).substring(2, 6).toUpperCase();
 };
 
-//TODO: add balanced picking of statements across eras
-const events: Statement[] = [
-  ...dataset.ancient_history,
-  ...(dataset.post_classical ?? []),
-  ...(dataset.early_modern ?? []),
-  ...(dataset.late_modern ?? []),
-];
+
+const events = {
+  ancient: dataset.ancient_history,
+  post_classical: dataset.post_classical,
+  early_modern: dataset.early_modern,
+  late_modern: dataset.late_modern,
+};
 
 // Helper to pick a set of statements
-const pickRandomStatements = (n: number): Statement[] => {
-  const chosenStatements = [];
-  const usedIndices = new Set();
+const pickRandomStatements = (n: number, era: GameEra): Statement[] => {
+  const chosenStatements: Statement[] = [];
+  const usedIndices = new Set<string>();
+  const eventsGroups = era.map((g) => events[g]).filter((g): g is Statement[] => Boolean(g));
+  if (eventsGroups.length === 0) return [];
+  let i = 0;
   while (chosenStatements.length < n) {
-    const randomIndex = Math.floor(Math.random() * events.length);
-    if (!usedIndices.has(randomIndex)) {
-      usedIndices.add(randomIndex);
-      chosenStatements.push(events[randomIndex]);
+    const group = eventsGroups[i % eventsGroups.length];
+    const item = group[Math.floor(Math.random() * group.length)];
+    if (!usedIndices.has(item.id)) {
+      usedIndices.add(item.id);
+      chosenStatements.push(item);
     }
+    i++;
   }
-  console.log(chosenStatements);
   return chosenStatements;
 }
 
@@ -158,7 +162,7 @@ io.on("connection", (socket) => {
       });
 
       // to push settings to client
-      const serverPickedStatements = pickRandomStatements(settings.noOfStatements ?? 5);
+      const serverPickedStatements = pickRandomStatements(settings.noOfStatements ?? 5, settings.era);
       const finalSettings = {
         ...settings,
         statements: serverPickedStatements
@@ -223,13 +227,14 @@ io.on("connection", (socket) => {
   })
 
   // SINGLE PLAYER GAME
-  socket.on("request_single_game", ({ noOfStatements = 5, difficulty = "easy" }) => {
-    const pickedStatements = pickRandomStatements(noOfStatements);
+  socket.on("request_single_game", ({ noOfStatements = 5, difficulty = "easy", era = ["ancient", "post_classical", "early_modern", "late_modern"] }) => {
+    const pickedStatements = pickRandomStatements(noOfStatements, era);
 
     const singlePlayerSettings = {
         mode: "single",
         noOfStatements,
         difficulty,
+        era,
         statements: pickedStatements
     };
 

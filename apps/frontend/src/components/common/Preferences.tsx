@@ -16,13 +16,13 @@ export default function Preferences({ onSetGamePreferences }: PreferencesProps) 
     // LOCAL STATES
     const [noOfStatements, setNoOfStatements] = useState<number>(5);
     const [difficulty, setDifficulty] = useState<GameDifficulty>("easy");
-    const [era, setEra] = useState<GameEra>([]);
+    const [era, setEra] = useState<GameEra>(["ancient", "post_classical", "early_modern", "late_modern"]);
     const [isCollapsibleOpen, setIsCollapsibleOpen] = useState<boolean>(false);
     const [saveAlert, setSaveAlert] = useState<boolean>(false);
 
     // HANDLERS
     const updatePreferences = () => {
-        onSetGamePreferences?.({ noOfStatements, difficulty });
+        onSetGamePreferences?.({ noOfStatements, difficulty, era });
         console.log(era); // TODO: use era
         setSaveAlert(true);
         setTimeout(() => {setSaveAlert(false)}, 1000);
@@ -53,6 +53,7 @@ export default function Preferences({ onSetGamePreferences }: PreferencesProps) 
                             type="single"
                             variant="outline"
                             defaultValue="easy"
+                            value={difficulty}
                             onValueChange={(value) => {
                                 if (value) {
                                     setDifficulty(value as GameDifficulty);
@@ -82,6 +83,7 @@ export default function Preferences({ onSetGamePreferences }: PreferencesProps) 
                             type="single"
                             variant="outline"
                             defaultValue="5"
+                            value={String(noOfStatements)}
                             onValueChange={(value) => {
                                 if (value) {
                                     setNoOfStatements(Number(value));
@@ -107,8 +109,10 @@ export default function Preferences({ onSetGamePreferences }: PreferencesProps) 
                         <ToggleGroup
                             type="multiple"
                             variant="outline"
-                            defaultValue={["ancient","post-classical","early-modern","late-modern"]}
+                            defaultValue={["ancient","post_classical","early_modern","late_modern"]}
+                            value={era}
                             onValueChange={(value) => {
+                                if (value.length === 0) return;
                                 if (value) {
                                     setEra(value as GameEra);
                                 }
@@ -119,15 +123,15 @@ export default function Preferences({ onSetGamePreferences }: PreferencesProps) 
                                 <span className="text-base leading-none font-light">Ancient History</span>
                                 <span className="text-xs text-muted-foreground font-light">c. 3200 BCE – c. 500 CE</span>
                             </ToggleGroupItem>
-                            <ToggleGroupItem value="post-classical" aria-label="Post Classical" className="flex flex-col items-center justify-center p-2 h-fit">
+                            <ToggleGroupItem value="post_classical" aria-label="Post Classical" className="flex flex-col items-center justify-center p-2 h-fit">
                                 <span className="text-base leading-none font-light">Post-Classical</span>
                                 <span className="text-xs text-muted-foreground font-light">c. 500 – c. 1499 CE</span>
                             </ToggleGroupItem>
-                            <ToggleGroupItem value="early-modern" aria-label="Early Modern" className="flex flex-col items-center justify-center h-fit p-2">
+                            <ToggleGroupItem value="early_modern" aria-label="Early Modern" className="flex flex-col items-center justify-center h-fit p-2">
                                 <span className="text-base leading-none font-light">Early Modern</span>
                                 <span className="text-xs text-muted-foreground font-light">c. 1500 – c. 1899 CE</span>
                             </ToggleGroupItem>
-                            <ToggleGroupItem value="late-modern" aria-label="Late Modern" className="flex flex-col items-center justify-center h-fit p-2">
+                            <ToggleGroupItem value="late_modern" aria-label="Late Modern" className="flex flex-col items-center justify-center h-fit p-2">
                                 <span className="text-base leading-none font-light">Late Modern</span>
                                 <span className="text-xs text-muted-foreground font-light">c. 1900 – c. 1999 CE</span>
                             </ToggleGroupItem>

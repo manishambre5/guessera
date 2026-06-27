@@ -19,7 +19,7 @@ type GameSetupProps = {
 function GameSetup({ onStart, onMultiplayerMode, onSetGameSettings }: GameSetupProps) {
     // LOCAL STATES
     const [mode, setMode] = useState<GameMode>("single");
-    const [gamePreferences, setGamePreferences] = useState<GamePreferences>({ noOfStatements: 5, difficulty: "easy" });
+    const [gamePreferences, setGamePreferences] = useState<GamePreferences>({ noOfStatements: 5, difficulty: "easy", era: ["ancient", "post_classical", "early_modern", "late_modern"] });
 
     // HANDLERS
     const updateSettings = (value: MultiPlayerAction) => {

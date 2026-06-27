@@ -10,7 +10,7 @@ import formatYear from "@/utils/formatYear";
 import { ChevronsLeft, ChevronsRight, Smile } from "lucide-react";
 import calculateScore from "@/utils/calculateScore";
 import { socket } from "@/utils/socket";
-import { eraBounds, periodBounds } from "@/utils/bounds";
+import getSliderBounds from "@/utils/sliderBounds";
 
 type ArenaProps = {
   gameSettings?: GameSettings;
@@ -36,6 +36,12 @@ export default function Arena({ onRoundEnd, gameSettings, partySettings }: Arena
     const oldestYear: number = -3199;
     const statement = chosenStatements[currentStatementIndex];
     const isRangeSlider = statement?.type === "period";
+    const { min, max } = getSliderBounds({
+        statement,
+        difficulty: gameSettings?.difficulty,
+        oldestYear,
+        currentYear,
+    });
 
     // Handle submit guess
     const handleSubmitGuess = (e?: React.SubmitEvent): void => {
@@ -166,8 +172,8 @@ export default function Arena({ onRoundEnd, gameSettings, partySettings }: Arena
         setSliderState({
             value:
                 statement.type === "period"
-                    ? [-999, 500]
-                    : [0],
+                    ? [(Math.round((min + (Math.round((min + max) / 2))) / 2)), (Math.round(((Math.round((min + max) / 2)) + max) / 2))]
+                    : [Math.round((min+max)/2)],
         });
     }, [chosenStatements, currentStatementIndex]);
 
@@ -244,18 +250,8 @@ export default function Arena({ onRoundEnd, gameSettings, partySettings }: Arena
                         </Button>
                         <Field className='w-full'>
                             <Slider
-                                min={
-                                    !statement ? oldestYear :
-                                    gameSettings?.difficulty === "easy" ? periodBounds(statement.periodLabel)[0]
-                                    : gameSettings?.difficulty === "medium" ? eraBounds(statement.eraLabel)[0]
-                                    : oldestYear
-                                }
-                                max={
-                                    !statement ? currentYear :
-                                    gameSettings?.difficulty === "easy" ? periodBounds(statement.periodLabel)[1]
-                                    : gameSettings?.difficulty === "medium" ? eraBounds(statement.eraLabel)[1]
-                                    : currentYear
-                                }
+                                min={min}
+                                max={max}
                                 step={1}
                                 value={sliderState.value}
                                 onValueChange={(val) => {
@@ -275,13 +271,13 @@ export default function Arena({ onRoundEnd, gameSettings, partySettings }: Arena
                             </div>
                             <div className="flex w-full">
                                 <span className="text-xs mr-auto">
-                                    {"upperbound"}
+                                    {formatYear(min)}
                                 </span>
                                 <span className="text-xs m-auto">
-                                    {"middle"}
+                                    {formatYear(Math.round((min+max)/2))}
                                 </span>
                                 <span className="text-xs ml-auto">
-                                    {"lowerbound"}
+                                    {formatYear(max)}
                                 </span>
                             </div>
                         </FieldLabel>

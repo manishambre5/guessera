@@ -146,7 +146,7 @@ function App() {
             ) : ( // player is on singleplayer mode
               <GameSetup
                 onStart={(preferences) => {
-                  socket.emit("request_single_game", { noOfStatements: preferences.noOfStatements, difficulty: preferences.difficulty });
+                  socket.emit("request_single_game", { noOfStatements: preferences.noOfStatements, difficulty: preferences.difficulty, era: preferences.era });
                 }}
                 onMultiplayerMode={(value: MultiPlayerAction) => {
                   setMultiplayerAction(value);

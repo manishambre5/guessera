@@ -1,8 +1,8 @@
 export type Dataset = {
   ancient_history: Statement[];
-  post_classical?: Statement[];
-  early_modern?: Statement[];
-  late_modern?: Statement[];
+  post_classical: Statement[];
+  early_modern: Statement[];
+  late_modern: Statement[];
 };
 
 export type StatementBase = {
@@ -52,14 +52,15 @@ export type GameRoundReport = {
 
 export type GameMode = "single" | "multi";
 export type GameDifficulty = "easy" | "medium" | "hard";
-export type Era = "ancient" | "post-classical" | "early-modern" | "late-modern";
-//export type Period = "early-history" | "classical-antiquity" | "common-era" | "early-post-classical" | "middle-post-classical" | "late-post-classical" | "early-modern" | "late-modern";
+export type Era = "ancient" | "post_classical" | "early_modern" | "late_modern";
+//export type Period = "early_history" | "classical_antiquity" | "common_era" | "early_post_classical" | "middle_post_classical" | "late_post_classical" | "early_modern" | "late_modern";
 export type GameEra = Era[];
 export type MultiPlayerAction = "create" | "join" | null;
 
 export type GamePreferences = {
   noOfStatements: number;
   difficulty: GameDifficulty;
+  era: GameEra;
 }
 export type GameSettings = GamePreferences & {
   mode: GameMode;
