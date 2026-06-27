@@ -61,7 +61,7 @@ export default function Arena({ onRoundEnd, gameSettings, partySettings }: Arena
             ? sliderState.value as [number, number]
             : sliderState.value[0];
 
-        const calculatedScore = calculateScore(guess, actual);
+        const calculatedScore = calculateScore(guess, actual, min, max);
         
         // update score state
         setScore((prevScore) => prevScore + calculatedScore);

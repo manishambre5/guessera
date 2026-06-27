@@ -1,5 +1,3 @@
-//TODO: tweak logic such that score is calculated relative to the era range (eg. Early Modern History -> 1500 - 1899 CE)
-
 function toRange(v: number | number[]): [number, number] {
     if (Array.isArray(v)) {
         if (v.length === 1) return [v[0], v[0]];
@@ -19,9 +17,11 @@ function rangeDistance(
 
 export default function calculateScore(
     guess: number | number[],
-    actual: number | [number, number]
+    actual: number | [number, number],
+    min: number,
+    max: number
 ): number {
-    const maxDifference = 2000;
+    const maxDifference = Math.abs(min-max);
     const maxScore = 1000;
     const guessRange = toRange(guess);
     const actualRange = toRange(actual);

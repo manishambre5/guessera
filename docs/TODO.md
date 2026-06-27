@@ -1,15 +1,3 @@
-- Fetch and use events from Wikipedia
-	- handle either year or year range properly by adding double thumb range selector in frontend
-	- handle the presence of dates in events
-	- use the Labels from the dataset in the frontend directly
-	- handle event year values like 'Late 4th Millennium BC', '470~469 BCE', ...
-	- integrate all of the remaining dataset
-	- balance the random statement picking logic
-
-- add option to choose era in game preferences and implement logic
-
-- implement difficulty levels (easy: input range shortens based on era to help with guess)
-
 - Move scoring logic to server.
 
 - Bug: countdown timer can be frozen at 0 by pressing and holding the slider arrows or moving the thumb.

@@ -23,7 +23,6 @@ export default function Preferences({ onSetGamePreferences }: PreferencesProps) 
     // HANDLERS
     const updatePreferences = () => {
         onSetGamePreferences?.({ noOfStatements, difficulty, era });
-        console.log(era); // TODO: use era
         setSaveAlert(true);
         setTimeout(() => {setSaveAlert(false)}, 1000);
     };
