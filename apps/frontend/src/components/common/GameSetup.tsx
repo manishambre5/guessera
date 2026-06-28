@@ -7,7 +7,7 @@ import { useState } from "react";
 import { type GamePreferences, type GameMode, type GameSettings, type MultiPlayerAction } from "@guessera/types";
 import Preferences from "./Preferences";
 import { ArrowUpRight } from "lucide-react";
-import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
+import { Sheet, SheetTrigger } from "../ui/sheet";
 import About from "./About";
 
 type GameSetupProps = {
@@ -86,50 +86,59 @@ function GameSetup({ onStart, onMultiplayerMode, onSetGameSettings }: GameSetupP
                         <Preferences onSetGamePreferences={setGamePreferences} />
                     }
 
+
                 </FieldGroup>
             </form>
         </CardContent>
         <CardFooter>
+            <div className="flex-1 space-x-2">
             {mode === "single" ? (
-                <div className="flex-1">
-                    <Button
-                        size="lg"
-                        onClick={() => updateSettings(null)}
-                        type="button"
-                    >
-                        Start Game
-                    </Button>
-                </div>
+                <Button
+                    size="lg"
+                    onClick={() => updateSettings(null)}
+                    type="button"
+                >
+                    Start Game
+                </Button>
             ) : (
-                <div className="flex-1 space-x-2">
-                    <Button
-                        size="lg"
-                        onClick={() => updateSettings("create")}
-                        type="button"
-                    >
-                        Create Party
-                    </Button>
-                    <Button
-                        size="lg"
-                        onClick={() => updateSettings("join")}
-                        type="button"
-                    >
-                        Join Party
-                    </Button>
-                </div>
+                <>
+                <Button
+                    size="lg"
+                    onClick={() => updateSettings("create")}
+                    type="button"
+                >
+                    Create Party
+                </Button>
+                <Button
+                    size="lg"
+                    onClick={() => updateSettings("join")}
+                    type="button"
+                >
+                    Join Party
+                </Button>
+                </>
             )}
-            <Button variant="link" size="xs" asChild>
-                <a href="https://github.com/manishambre5/guessera">
-                    <span>source code</span>
-                    <ArrowUpRight />
-                </a>
-            </Button>
+            </div>
+
+            <Separator orientation="vertical" />
+
+            <div className="flex flex-col items-start">
+                <SheetTrigger asChild>
+                    <Button variant="link" size="xs" className="">how to play</Button>
+                </SheetTrigger>
+                <Button variant="link" size="xs" asChild>
+                    <a href="https://github.com/manishambre5/guessera">
+                        <span>source code</span>
+                        <ArrowUpRight />
+                    </a>
+                </Button>
+            </div>
         </CardFooter>
     </Card>
 
-    <SheetContent>
-        <About />
-    </SheetContent>
+
+    <About />
+    
     </Sheet>
   );
 }

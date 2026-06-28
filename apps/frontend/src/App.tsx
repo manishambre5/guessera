@@ -100,10 +100,7 @@ function App() {
   }, []);
 
   return (
-    <div className="relative h-full">
-      <div className="fixed inset-0 bg-cover bg-center blur-pxs" />
-
-      <div className="fixed inset-0 bg-black/50" />
+    <div className="relative h-full ">
 
       <div className='flex flex-col gap-2 min-h-screen size-full items-center justify-center p-2 relative z-10'>
         {playing && gameSettings ? ( // player is playing a game

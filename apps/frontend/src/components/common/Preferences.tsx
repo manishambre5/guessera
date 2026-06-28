@@ -1,4 +1,4 @@
-import { Check, ChevronsUpDown } from "lucide-react";
+import { Check, ChevronsDownUp, ChevronsUpDown } from "lucide-react";
 import { Button } from "../ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui/collapsible";
 import { Field, FieldLabel, FieldSet } from "../ui/field";
@@ -38,13 +38,13 @@ export default function Preferences({ onSetGamePreferences }: PreferencesProps) 
                 <CollapsibleTrigger asChild>
                     <Button variant="secondary" className="w-fit">
                         <span className="uppercase font-normal">Game Preferences</span>
-                        <ChevronsUpDown />
+                        {isCollapsibleOpen ? <ChevronsDownUp /> : <ChevronsUpDown />}
                         <span className="sr-only">Toggle preferences</span>
                     </Button>
                 </CollapsibleTrigger>
 
 
-                <CollapsibleContent className="flex flex-col gap-2 items-start flex-wrap animate-collapsible-down">
+                <CollapsibleContent className="flex flex-col gap-2 items-start flex-wrap data-[state=open]:animate-collapsible-down data-[state=closed]:animate-collapsible-up">
                     <Item variant="outline">
                     <Field orientation="horizontal">
                         <FieldLabel>Difficulty</FieldLabel>
