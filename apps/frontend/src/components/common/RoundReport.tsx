@@ -107,7 +107,7 @@ const RoundReport: React.FC<GameRoundReportProps> = ({ chosenStatements, report,
                                   <span> - </span>
                                   {formatYear(item.guessedYear[1])}
                                 </>)
-                              : formatYear(item.guessedYear)
+                              : item.guessedYear ? (formatYear(item.guessedYear)) : "-"
                           }
                         </TableCell>
                         <TableCell className="text-center bg-accent font-semibold">

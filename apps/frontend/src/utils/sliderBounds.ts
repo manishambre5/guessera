@@ -36,7 +36,7 @@ function periodBounds(label: string): [number, number] {
 		return [1000, 1300];
 	} else if (label === "Late post-classical history") {
 		return [1300, 1500];
-	} else if (label === "16th century" || "17th century" || "18th century" || "19th century") {
+	} else if (["16th century", "17th century", "18th century", "19th century"].includes(label)) {
 		return [1500, 1900];
 	} else {
 		return [1900, 2000];

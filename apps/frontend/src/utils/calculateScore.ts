@@ -16,23 +16,28 @@ function rangeDistance(
 }
 
 export default function calculateScore(
-    guess: number | number[],
+    guess: number | number[] | null,
     actual: number | [number, number],
     min: number,
     max: number
 ): number {
     const maxDifference = Math.abs(min-max);
     const maxScore = 1000;
-    const guessRange = toRange(guess);
-    const actualRange = toRange(actual);
 
-    const difference = rangeDistance(guessRange, actualRange);
+    if (guess === null)
+        return 0;
+    else {
+        const guessRange = toRange(guess);
+        const actualRange = toRange(actual);
 
-    if (difference >= maxDifference) return 0;
+        const difference = rangeDistance(guessRange, actualRange);
 
-    // exponential scoring to reward close guesses
-    const normalized = 1 - difference / maxDifference; // 1.0 perfect, 0.0 at maxDiff
-    const result = Math.round(maxScore * Math.pow(normalized, 3)); // cubic/exponential curve
+        if (difference >= maxDifference) return 0;
 
-    return result;
+        // exponential scoring to reward close guesses
+        const normalized = 1 - difference / maxDifference; // 1.0 perfect, 0.0 at maxDiff
+        const result = Math.round(maxScore * Math.pow(normalized, 3)); // cubic/exponential curve
+
+        return result;
+    }
 }

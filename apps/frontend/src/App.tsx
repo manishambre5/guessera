@@ -100,9 +100,8 @@ function App() {
   }, []);
 
   return (
-    <div className="relative h-full ">
 
-      <div className='flex flex-col gap-2 min-h-screen size-full items-center justify-center p-2 relative z-10'>
+      <div className='flex flex-col gap-2 min-h-screen size-full items-center justify-center p-2 box-border bg-chart-1'>
         {playing && gameSettings ? ( // player is playing a game
           <Arena
             onRoundEnd={handleGameRoundEnd}
@@ -153,7 +152,7 @@ function App() {
           )
         )}
       </div>
-    </div>
+
   );
 }
 

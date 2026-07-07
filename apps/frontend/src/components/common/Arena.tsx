@@ -44,9 +44,7 @@ export default function Arena({ onRoundEnd, gameSettings, partySettings }: Arena
     });
 
     // Handle submit guess
-    const handleSubmitGuess = (e?: React.SubmitEvent): void => {
-        if (e) e.preventDefault();
-        console.log(chosenStatements[currentStatementIndex].type);
+    const handleSubmitGuess = (activeSubmit: boolean): void => {
         
         // calculate the score
         const statement = chosenStatements[currentStatementIndex];
@@ -57,10 +55,13 @@ export default function Arena({ onRoundEnd, gameSettings, partySettings }: Arena
                 ? statement.yearRange
                 : statement.year;
 
-        const guess: Guess = isRangeSlider
-            ? sliderState.value as [number, number]
-            : sliderState.value[0];
+        const guess: Guess = activeSubmit
+            ? (isRangeSlider
+                ? (sliderState.value as [number, number])
+                : sliderState.value[0])
+            : null;
 
+        // score set to zero if submit button isn't clicked and time has run out
         const calculatedScore = calculateScore(guess, actual, min, max);
         
         // update score state
@@ -69,9 +70,7 @@ export default function Arena({ onRoundEnd, gameSettings, partySettings }: Arena
         // build guess object for report
         const guessData: PlayerGuess = {
             statementId: statement.id,
-            guessedYear: isRangeSlider
-                ? sliderState.value as [number, number]
-                : sliderState.value[0],
+            guessedYear: guess,
             guessScore: calculatedScore,
         };
         // updating player guess data for report
@@ -179,7 +178,7 @@ export default function Arena({ onRoundEnd, gameSettings, partySettings }: Arena
 
 
   return (
-    <div className='flex flex-col gap-2 size-full justify-between lg:w-5/6 bg-background p-2 rounded-t-lg rounded-b-2xl'>
+    <div className='flex flex-col gap-2 min-h-[calc(100vh-1rem)] size-full justify-between bg-background p-2 box-border rounded-t-lg rounded-b-2xl'>
 
         {/* Score and Timer */}
         <header className="h-fit flex flex-row-reverse gap-2 justify-between items-start">
@@ -197,7 +196,7 @@ export default function Arena({ onRoundEnd, gameSettings, partySettings }: Arena
                 <ItemContent>
                     <ItemTitle className="text-2xl">
                         {gameOver ? "00" :
-                            <Countdown key={round} limit={20} onComplete={handleSubmitGuess} />
+                            <Countdown key={round} limit={20} onComplete={() => handleSubmitGuess(false)} />
                         }
                     </ItemTitle>
                 </ItemContent>
@@ -205,7 +204,7 @@ export default function Arena({ onRoundEnd, gameSettings, partySettings }: Arena
         </header>
 
         {/* Statement section */}
-        <section className="flex-1 md:min-h-96 flex flex-col items-center justify-center aspect-video">
+        <section className="flex-1 md:min-h-96x flex flex-col items-center justify-center">
             {gameOver ? (
                 <Card className="flex-1 flex flex-col justify-center aspect-video md:aspect-auto w-full">
                     <CardHeader className="flex flex-col items-center">
@@ -233,7 +232,10 @@ export default function Arena({ onRoundEnd, gameSettings, partySettings }: Arena
                 <CardContent>
                 <form
                     className="flex flex-col gap-4 h-1/3"
-                    onSubmit={handleSubmitGuess}
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        handleSubmitGuess(true);
+                    }}
                 >
                     {/* Guess Controls */}
                     <div className="flex gap-1">

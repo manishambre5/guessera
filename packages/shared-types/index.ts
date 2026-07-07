@@ -24,7 +24,7 @@ export type Statement =
       yearRangeLabel?: string;
     });
 
-export type Guess = number | [number, number];
+export type Guess = number | [number, number] | null;
 
 export type SliderState = { value: [number] | [number, number] };
 
