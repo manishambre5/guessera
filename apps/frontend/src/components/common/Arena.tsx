@@ -10,7 +10,7 @@ import formatYear from "@/utils/formatYear";
 import { ChevronsLeft, ChevronsRight, Smile } from "lucide-react";
 import calculateScore from "@/utils/calculateScore";
 import { socket } from "@/utils/socket";
-import getSliderBounds from "@/utils/sliderBounds";
+import getDifficultyConfig from "@/utils/sliderBounds";
 
 type ArenaProps = {
   gameSettings?: GameSettings;
@@ -36,7 +36,7 @@ export default function Arena({ onRoundEnd, gameSettings, partySettings }: Arena
     const oldestYear: number = -3199;
     const statement = chosenStatements[currentStatementIndex];
     const isRangeSlider = statement?.type === "period";
-    const { min, max } = getSliderBounds({
+    const { min, max, countdown } = getDifficultyConfig({
         statement,
         difficulty: gameSettings?.difficulty,
         oldestYear,
@@ -108,13 +108,15 @@ export default function Arena({ onRoundEnd, gameSettings, partySettings }: Arena
         setSliderState((prev) => {
             const next = [...prev.value] as [number] | [number, number];
 
-            next[thumbIndex] = Math.min(
-                currentYear,
-                Math.max(oldestYear, (next[thumbIndex] ?? next[0]) + step)
+            // for single thumb slider
+            const index = next.length === 1 ? 0 : thumbIndex;
+            next[index] = Math.min(
+                max,
+                Math.max(min, (next[index] ?? next[0]) + step)
             );
 
             if (next.length === 2) {
-                if (thumbIndex === 0) next[0] = Math.min(next[0], next[1]);
+                if (index === 0) next[0] = Math.min(next[0], next[1]);
                 else next[1] = Math.max(next[1], next[0]);
             }
 
@@ -196,7 +198,7 @@ export default function Arena({ onRoundEnd, gameSettings, partySettings }: Arena
                 <ItemContent>
                     <ItemTitle className="text-2xl">
                         {gameOver ? "00" :
-                            <Countdown key={round} limit={20} onComplete={() => handleSubmitGuess(false)} />
+                            <Countdown key={round} limit={countdown} onComplete={() => handleSubmitGuess(false)} />
                         }
                     </ItemTitle>
                 </ItemContent>

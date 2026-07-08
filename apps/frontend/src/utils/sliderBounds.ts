@@ -43,26 +43,28 @@ function periodBounds(label: string): [number, number] {
 	}
 }
 
-export default function getSliderBounds({
+export default function getDifficultyConfig({
     statement,
     difficulty,
     oldestYear,
     currentYear
 } : SliderBoundsProps) {
     if (!statement?.eraLabel || !statement?.periodLabel || !difficulty) {
-        return { min: oldestYear, max: currentYear };
+        return { min: oldestYear, max: currentYear, countdown: 25 };
     }
 
     switch (difficulty) {
         case "easy": {
             const [min, max] = periodBounds(statement.periodLabel);
-            return { min, max };
+			const countdown = 25;
+            return { min, max, countdown };
         }
         case "medium": {
             const [min, max] = eraBounds(statement.eraLabel);
-            return { min, max };
+			const countdown = 20;
+            return { min, max, countdown };
         }
         default:
-            return { min: oldestYear, max: currentYear };
+            return { min: oldestYear, max: currentYear, countdown: 15 };
     }
 }
