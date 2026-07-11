@@ -28,9 +28,5 @@
     "ts-node": "^10.9.2",
     "tsx": "^4.22.3",
     "typescript": "~6.0.3"
-  },
-  "engines": {
-    "node": "22.x",
-    "pnpm": "10.x"
   }
 }
