@@ -1,4 +1,5 @@
-import { Dataset } from "@guessera/types";
+//import { Dataset } from "@guessera/types";
+import { Dataset } from "./types/index.js"; // cauz heroku can't work with pnpm workspaces?
 import A from "./data/ancient_history.json" with { type: 'json' };
 import B from "./data/post_classical.json" with { type: 'json' };
 import C from "./data/early_modern.json" with { type: 'json' };

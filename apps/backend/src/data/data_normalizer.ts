@@ -1,4 +1,5 @@
-import { Statement } from "@guessera/types";
+//import { Statement } from "@guessera/types";
+import { Statement } from "../types/index.js"; // cauz heroku can't work with pnpm workspaces?
 
 type RawDataA = {
 	era: string;
