@@ -9,7 +9,7 @@
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
     "start": "tsc && node dist/server.js",
-    "heroku-postbuild": "pnpm build"
+    "heroku-postbuild": "npm run build"
   },
   "keywords": [],
   "author": "",
