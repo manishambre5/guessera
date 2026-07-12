@@ -2,7 +2,8 @@ import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
-import type { Player, PartySettings as Party, Statement, GameEra } from "@guessera/types";
+//import type { Player, PartySettings as Party, Statement, GameEra } from "@guessera/types";
+import type { Player, PartySettings as Party, Statement, GameEra } from "./types/index.js"; // cauz heroku can't work with pnpm workspaces?
 import { dataset } from './data.js';
 
 const app = express();
