@@ -269,7 +269,7 @@ io.on("connection", (socket) => {
 
 
 
-const PORT = 3001;
+const PORT = parseInt(process.env.PORT || "3001", 10);
 httpServer.listen(PORT, "0.0.0.0" , () => {
   console.log(`Server running and listening on all interfaces on port ${PORT}`);
 });
