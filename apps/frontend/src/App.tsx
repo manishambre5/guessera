@@ -7,6 +7,7 @@ import CreateParty from './components/multiplayer/CreateParty';
 import JoinParty from './components/multiplayer/JoinParty';
 import Party from './components/multiplayer/Party';
 import { socket } from './utils/socket';
+import { Loader2 } from 'lucide-react';
 
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
   const [partySettings, setPartySettings] = useState<PartySettings>();
   const [partyRoomLeaderboard, setPartyRoomLeaderboard] = useState<any[] | null>(null);
   const [roundHistory, setRoundHistory] = useState<RoundStats[]>([]);
+  const [connected, setConnected] = useState(false); // heroku eco dyno wakes up and socket connects...
 
 
   // HANDLERS
@@ -90,14 +92,28 @@ function App() {
       }
     });
 
+    socket.on("connect", () => setConnected(true));
+    socket.on("disconnect", () => setConnected(false));
+
     return (() => {
       socket.off("game_started");
       socket.off("game_over_leaderboard");
       socket.off("single_game_ready");
       socket.off("party_updated");
+      socket.off("connect");
+      socket.off("disconnect");
       socket.disconnect();
     });
   }, []);
+
+  if (!connected) {
+    return (
+        <div className="fixed inset-0 flex flex-col items-center justify-center gap-2 z-50 text-muted-foreground">
+            <Loader2 className='animate-spin' />
+            <p className="uppercase">Connecting to server</p>
+        </div>
+    );
+  }
 
   return (
 
