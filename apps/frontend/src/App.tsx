@@ -7,7 +7,7 @@ import CreateParty from './components/multiplayer/CreateParty';
 import JoinParty from './components/multiplayer/JoinParty';
 import Party from './components/multiplayer/Party';
 import { socket } from './utils/socket';
-import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from './components/ui/empty';
+import { Empty, EmptyHeader, EmptyMedia, EmptyTitle } from './components/ui/empty';
 import { Spinner } from './components/ui/spinner';
 
 
