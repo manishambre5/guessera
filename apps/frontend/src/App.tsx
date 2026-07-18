@@ -7,7 +7,8 @@ import CreateParty from './components/multiplayer/CreateParty';
 import JoinParty from './components/multiplayer/JoinParty';
 import Party from './components/multiplayer/Party';
 import { socket } from './utils/socket';
-import { Loader2 } from 'lucide-react';
+import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from './components/ui/empty';
+import { Spinner } from './components/ui/spinner';
 
 
 function App() {
@@ -108,10 +109,14 @@ function App() {
 
   if (!connected) {
     return (
-        <div className="fixed inset-0 flex flex-col items-center justify-center gap-2 z-50 text-muted-foreground">
-            <Loader2 className='animate-spin' />
-            <p className="uppercase">Connecting to server</p>
-        </div>
+        <Empty className="h-screen">
+          <EmptyHeader className='text-chart-2'>
+            <EmptyMedia>
+              <Spinner className='size-10' />
+            </EmptyMedia>
+            <EmptyTitle>Connecting to the server...</EmptyTitle>
+          </EmptyHeader>
+        </Empty>
     );
   }
 
